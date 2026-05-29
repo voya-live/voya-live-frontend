@@ -283,3 +283,12 @@ input {
     width: 90%;
   }
 }
+.micBtn.active {
+  background: #b985ff;
+  color: #000;
+}
+
+.micBtn.muted {
+  background: #444;
+  color: #fff;
+}

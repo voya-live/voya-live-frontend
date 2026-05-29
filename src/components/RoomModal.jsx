@@ -152,9 +152,12 @@ export default function RoomModal({
         </div>
 
         <div className="giftBar">
-          <button onClick={toggleMic}>
-            {micOn ? "Mute Mic" : "Unmute Mic"}
-          </button>
+          <button
+  onClick={toggleMic}
+  className={micOn ? "micBtn active" : "micBtn muted"}
+>
+  {micOn ? "Mic On" : "Mic Off"}
+</button>
 
           <button onClick={sendGift}>🌹 Rose -20</button>
           <button onClick={sendGift}>💎 Diamond -20</button>
