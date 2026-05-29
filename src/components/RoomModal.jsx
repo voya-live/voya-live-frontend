@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import AgoraRTC from "agora-rtc-sdk-ng";
-
+AgoraRTC.setLogLevel(4);
 const appId = "0408a7d6547447dda62aec167d720c9b";
 const backendUrl = "https://voya-live-backend.onrender.com";
 
