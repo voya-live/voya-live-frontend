@@ -50,11 +50,11 @@ export default function RoomModal({
 
         const tokenData = await tokenRes.json();
 
-        console.log("Agora token data:", tokenData);
+        if (!tokenData.token) {
+          throw new Error("Agora token not received");
+        }
 
         await client.join(appId, channelName, tokenData.token, uid);
-
-        console.log("AGORA JOINED CHANNEL:", channelName);
 
         const localMicTrack =
           await AgoraRTC.createMicrophoneAudioTrack();
@@ -64,11 +64,8 @@ export default function RoomModal({
         setMicOn(true);
 
         await client.publish([localMicTrack]);
-
-        console.log("AGORA MIC PUBLISHED");
       } catch (error) {
-        console.error("AGORA ERROR:", error);
-        alert("Agora voice error. Check Console.");
+        alert("Voice connection error. Please try again.");
       }
     }
 
@@ -95,7 +92,7 @@ export default function RoomModal({
     const track = micRef.current || micTrack;
 
     if (!track) {
-      alert("Mic track not ready yet");
+      alert("Mic is still preparing. Please try again.");
       return;
     }
 
