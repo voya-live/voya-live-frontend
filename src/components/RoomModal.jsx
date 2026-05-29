@@ -120,10 +120,10 @@ export default function RoomModal({
         <div className="micGrid">
           {roomUsers.length > 0 ? (
             roomUsers.map((item) => (
-              <div className="micSeat" key={item.id}>
+              <div className="micSeat activeSpeaker" key={item.id}>
                 <div className="micAvatar">{item.name?.[0] || "U"}</div>
                 <span>{item.name}</span>
-              </div>
+                </div>
             ))
           ) : (
             <div className="micSeat">
