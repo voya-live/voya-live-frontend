@@ -30,14 +30,15 @@ export default function RoomModal({
     async function joinVoice() {
       try {
         client.on("user-published", async (remoteUser, mediaType) => {
-          await client.subscribe(remoteUser, mediaType);
+  await client.subscribe(remoteUser, mediaType);
 
-          if (mediaType === "audio") {
-            remoteUser.audioTrack.play();
-          }
-        });
+  if (mediaType === "audio" && remoteUser.audioTrack) {
+    remoteUser.audioTrack.play();
+  }
+});
 
         await client.join(appId, channelName, null, null);
+        console.log("AGORA JOINED CHANNEL:", channelName);
 
         const localMicTrack =
           await AgoraRTC.createMicrophoneAudioTrack();
@@ -45,6 +46,7 @@ export default function RoomModal({
         setMicTrack(localMicTrack);
 
         await client.publish([localMicTrack]);
+        console.log("AGORA MIC PUBLISHED");
       } catch (error) {
         console.error("Agora voice error:", error);
       }
