@@ -177,10 +177,10 @@ export default function RoomModal({
   }
 
   function isUserSpeaking(item) {
-    const uid = makeNumericUid(item.id || item._id || item.userId);
+  if (!item.agoraUid) return false;
 
-    return activeSpeakers.includes(String(uid));
-  }
+  return activeSpeakers.includes(String(item.agoraUid));
+}
 
   return (
     <div className="modal">
