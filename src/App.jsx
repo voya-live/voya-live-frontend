@@ -113,26 +113,32 @@ function App() {
   }
 
   function joinRoom(room) {
-    setJoinedRoom(room);
+  const roomId = String(room._id || room.id);
 
-    socket.emit("room:join", {
-      roomId: String(room.id),
-      user: {
-        id: user.phone,
-        name: user.name,
-      },
-    });
-  }
+  setJoinedRoom(room);
+
+  socket.emit("room:join", {
+    roomId,
+    user: {
+      id: user.phone,
+      name: user.name,
+    },
+  });
+}
 
   function sendMessage(text) {
-    if (!joinedRoom || !user) return;
+  if (!joinedRoom || !user) return;
 
-    socket.emit("room:chat", {
-      roomId: String(joinedRoom.id),
-      user: { name: user.name },
-      message: text,
-    });
-  }
+  const roomId = String(joinedRoom._id || joinedRoom.id);
+
+  socket.emit("room:chat", {
+    roomId,
+    user: {
+      name: user.name,
+    },
+    message: text,
+  });
+}
 
   async function recharge() {
     const token = localStorage.getItem("voya_token");
