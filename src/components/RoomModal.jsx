@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import AgoraRTC from "agora-rtc-sdk-ng";
+
 AgoraRTC.setLogLevel(4);
+
 const appId = "0408a7d6547447dda62aec167d720c9b";
 const backendUrl = "https://voya-live-backend.onrender.com";
 
@@ -8,6 +10,44 @@ const client = AgoraRTC.createClient({
   mode: "rtc",
   codec: "vp8",
 });
+
+function getNumericUid() {
+  const storedUser =
+    localStorage.getItem("user") ||
+    localStorage.getItem("currentUser");
+
+  if (storedUser) {
+    try {
+      const parsed = JSON.parse(storedUser);
+      const rawId = parsed._id || parsed.id || parsed.userId;
+
+      if (rawId) {
+        let hash = 0;
+        const str = String(rawId);
+
+        for (let i = 0; i < str.length; i++) {
+          hash = (hash << 5) - hash + str.charCodeAt(i);
+          hash |= 0;
+        }
+
+        return Math.abs(hash);
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  const savedUid = localStorage.getItem("agoraUid");
+
+  if (savedUid) {
+    return Number(savedUid);
+  }
+
+  const newUid = Math.floor(Math.random() * 1000000);
+  localStorage.setItem("agoraUid", String(newUid));
+
+  return newUid;
+}
 
 export default function RoomModal({
   joinedRoom,
@@ -20,8 +60,10 @@ export default function RoomModal({
   const [chatText, setChatText] = useState("");
   const [micTrack, setMicTrack] = useState(null);
   const [micOn, setMicOn] = useState(true);
+  const [activeSpeakers, setActiveSpeakers] = useState([]);
 
   const micRef = useRef(null);
+  const agoraUidRef = useRef(null);
 
   useEffect(() => {
     if (!joinedRoom) return;
@@ -31,6 +73,15 @@ export default function RoomModal({
     async function joinVoice() {
       try {
         client.removeAllListeners();
+        client.enableAudioVolumeIndicator();
+
+        client.on("volume-indicator", (volumes) => {
+          const speakingUsers = volumes
+            .filter((v) => v.level > 5)
+            .map((v) => String(v.uid));
+
+          setActiveSpeakers(speakingUsers);
+        });
 
         client.on("user-published", async (remoteUser, mediaType) => {
           await client.subscribe(remoteUser, mediaType);
@@ -40,7 +91,8 @@ export default function RoomModal({
           }
         });
 
-        const uid = Math.floor(Math.random() * 1000000);
+        const uid = getNumericUid();
+        agoraUidRef.current = uid;
 
         const tokenRes = await fetch(
           `${backendUrl}/api/agora/token?channelName=${encodeURIComponent(
@@ -64,7 +116,7 @@ export default function RoomModal({
         setMicOn(true);
 
         await client.publish([localMicTrack]);
-      } catch (error) {
+      } catch {
         alert("Voice connection error. Please try again.");
       }
     }
@@ -100,16 +152,39 @@ export default function RoomModal({
     setMicOn(!micOn);
   }
 
+  async function closeRoom() {
+    try {
+      if (micRef.current) {
+        micRef.current.stop();
+        micRef.current.close();
+        micRef.current = null;
+      }
+
+      await client.leave();
+    } catch {
+      // ignore
+    }
+
+    setJoinedRoom(null);
+  }
+
   function handleSend() {
     if (!chatText.trim()) return;
+
     sendMessage(chatText);
     setChatText("");
+  }
+
+  function isUserSpeaking(item) {
+    const uid = String(item.agoraUid || item.id || item._id);
+
+    return activeSpeakers.includes(uid);
   }
 
   return (
     <div className="modal">
       <div className="roomPanel">
-        <button className="close" onClick={() => setJoinedRoom(null)}>
+        <button className="close" onClick={closeRoom}>
           ×
         </button>
 
@@ -120,10 +195,19 @@ export default function RoomModal({
         <div className="micGrid">
           {roomUsers.length > 0 ? (
             roomUsers.map((item) => (
-              <div className="micSeat activeSpeaker" key={item.id}>
-                <div className="micAvatar">{item.name?.[0] || "U"}</div>
-                <span>{item.name}</span>
+              <div
+                className={
+                  isUserSpeaking(item)
+                    ? "micSeat activeSpeaker"
+                    : "micSeat"
+                }
+                key={item.id}
+              >
+                <div className="micAvatar">
+                  {item.name?.[0] || "U"}
                 </div>
+                <span>{item.name}</span>
+              </div>
             ))
           ) : (
             <div className="micSeat">
@@ -148,16 +232,17 @@ export default function RoomModal({
             onChange={(e) => setChatText(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
           />
+
           <button onClick={handleSend}>Send</button>
         </div>
 
         <div className="giftBar">
           <button
-  onClick={toggleMic}
-  className={micOn ? "micBtn active" : "micBtn muted"}
->
-  {micOn ? "Mic On" : "Mic Off"}
-</button>
+            onClick={toggleMic}
+            className={micOn ? "micBtn active" : "micBtn muted"}
+          >
+            {micOn ? "Mic On" : "Mic Off"}
+          </button>
 
           <button onClick={sendGift}>🌹 Rose -20</button>
           <button onClick={sendGift}>💎 Diamond -20</button>
