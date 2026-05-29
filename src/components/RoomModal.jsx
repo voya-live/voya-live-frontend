@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AgoraRTC from "agora-rtc-sdk-ng";
 
-const appId = "0408a7d6547447dda62aec167d720c9b";
+const appId = "YOUR_AGORA_APP_ID_HERE";
 
 const client = AgoraRTC.createClient({
   mode: "rtc",
@@ -18,52 +18,66 @@ export default function RoomModal({
 }) {
   const [chatText, setChatText] = useState("");
   const [micTrack, setMicTrack] = useState(null);
-const [micOn, setMicOn] = useState(true);
+  const [micOn, setMicOn] = useState(true);
 
   useEffect(() => {
-    client.on("user-published", async (remoteUser, mediaType) => {
-  await client.subscribe(remoteUser, mediaType);
+    if (!joinedRoom) return;
 
-  if (mediaType === "audio") {
-    remoteUser.audioTrack.play();
-  }
-});
+    const channelName = String(
+      joinedRoom._id || joinedRoom.id || joinedRoom.name
+    );
+
     async function joinVoice() {
-      if (!joinedRoom) return;
+      try {
+        client.on("user-published", async (remoteUser, mediaType) => {
+          await client.subscribe(remoteUser, mediaType);
 
-      alert("Trying to connect microphone");
+          if (mediaType === "audio") {
+            remoteUser.audioTrack.play();
+          }
+        });
 
-      await client.join(appId, String(joinedRoom.id), null, null);
+        await client.join(appId, channelName, null, null);
 
-      const micTrack = await AgoraRTC.createMicrophoneAudioTrack();
-      setMicTrack(micTrack);
+        const localMicTrack =
+          await AgoraRTC.createMicrophoneAudioTrack();
 
-      alert("Microphone connected");
+        setMicTrack(localMicTrack);
 
-      await client.publish([micTrack]);
-
-      alert("Voice connected successfully");
+        await client.publish([localMicTrack]);
+      } catch (error) {
+        console.error("Agora voice error:", error);
+      }
     }
 
     joinVoice();
 
     return () => {
+      if (micTrack) {
+        micTrack.stop();
+        micTrack.close();
+      }
+
+      client.removeAllListeners();
       client.leave();
     };
   }, [joinedRoom]);
 
   if (!joinedRoom) return null;
 
-  const roomUsers = liveRooms[String(joinedRoom.id)]?.users || [];
-  async function toggleMic() {
-  if (!micTrack) return;
+  const roomUsers =
+    liveRooms[String(joinedRoom._id || joinedRoom.id)]?.users || [];
 
-  await micTrack.setEnabled(!micOn);
-  setMicOn(!micOn);
-}
+  async function toggleMic() {
+    if (!micTrack) return;
+
+    await micTrack.setEnabled(!micOn);
+    setMicOn(!micOn);
+  }
 
   function handleSend() {
     if (!chatText.trim()) return;
+
     sendMessage(chatText);
     setChatText("");
   }
@@ -71,17 +85,24 @@ const [micOn, setMicOn] = useState(true);
   return (
     <div className="modal">
       <div className="roomPanel">
-        <button className="close" onClick={setJoinedRoom}>×</button>
+        <button className="close" onClick={setJoinedRoom}>
+          ×
+        </button>
 
         <h2>{joinedRoom.name}</h2>
+
         <p>Hosted by {joinedRoom.host}</p>
+
         <p>{roomUsers.length} users live now</p>
 
         <div className="micGrid">
           {roomUsers.length > 0 ? (
             roomUsers.map((item) => (
               <div className="micSeat" key={item.id}>
-                <div className="micAvatar">{item.name[0]}</div>
+                <div className="micAvatar">
+                  {item.name[0]}
+                </div>
+
                 <span>{item.name}</span>
               </div>
             ))
@@ -106,15 +127,19 @@ const [micOn, setMicOn] = useState(true);
             placeholder="Type message..."
             value={chatText}
             onChange={(e) => setChatText(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            onKeyDown={(e) =>
+              e.key === "Enter" && handleSend()
+            }
           />
+
           <button onClick={handleSend}>Send</button>
         </div>
 
         <div className="giftBar">
           <button onClick={toggleMic}>
-  {micOn ? "Mute Mic" : "Unmute Mic"}
-</button>  
+            {micOn ? "Mute Mic" : "Unmute Mic"}
+          </button>
+
           <button onClick={sendGift}>🌹 Rose -20</button>
           <button onClick={sendGift}>💎 Diamond -20</button>
           <button onClick={sendGift}>👑 Crown -20</button>
