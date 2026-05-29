@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import AgoraRTC from "agora-rtc-sdk-ng";
 
 const appId = "0408a7d6547447dda62aec167d720c9b";
@@ -20,6 +20,8 @@ export default function RoomModal({
   const [micTrack, setMicTrack] = useState(null);
   const [micOn, setMicOn] = useState(true);
 
+  const micTrackRef = useRef(null);
+
   useEffect(() => {
     if (!joinedRoom) return;
 
@@ -29,39 +31,52 @@ export default function RoomModal({
 
     async function joinVoice() {
       try {
-        client.on("user-published", async (remoteUser, mediaType) => {
-  await client.subscribe(remoteUser, mediaType);
+        client.removeAllListeners();
 
-  if (mediaType === "audio" && remoteUser.audioTrack) {
-    remoteUser.audioTrack.play();
-  }
-});
+        client.on("user-published", async (remoteUser, mediaType) => {
+          console.log("Remote user published:", remoteUser, mediaType);
+
+          await client.subscribe(remoteUser, mediaType);
+
+          if (mediaType === "audio" && remoteUser.audioTrack) {
+            remoteUser.audioTrack.play();
+            console.log("Remote audio playing");
+          }
+        });
 
         await client.join(appId, channelName, null, null);
         console.log("AGORA JOINED CHANNEL:", channelName);
 
+        console.log("Creating microphone...");
+
         const localMicTrack =
           await AgoraRTC.createMicrophoneAudioTrack();
 
+        console.log("Microphone created:", localMicTrack);
+
+        micTrackRef.current = localMicTrack;
         setMicTrack(localMicTrack);
+        setMicOn(true);
 
         await client.publish([localMicTrack]);
         console.log("AGORA MIC PUBLISHED");
       } catch (error) {
-        console.error("Agora voice error:", error);
+        console.error("AGORA ERROR:", error);
+        alert("Agora voice error. Check Console.");
       }
     }
 
     joinVoice();
 
     return () => {
-      if (micTrack) {
-        micTrack.stop();
-        micTrack.close();
+      if (micTrackRef.current) {
+        micTrackRef.current.stop();
+        micTrackRef.current.close();
+        micTrackRef.current = null;
       }
 
       client.removeAllListeners();
-      client.leave();
+      client.leave().catch(() => {});
     };
   }, [joinedRoom]);
 
@@ -71,18 +86,20 @@ export default function RoomModal({
     liveRooms[String(joinedRoom._id || joinedRoom.id)]?.users || [];
 
   async function toggleMic() {
-  console.log("Toggle clicked. micTrack =", micTrack, "micOn =", micOn);
+    const track = micTrackRef.current || micTrack;
 
-  if (!micTrack) {
-    alert("Mic track not ready yet");
-    return;
+    console.log("Toggle clicked. micTrack =", track, "micOn =", micOn);
+
+    if (!track) {
+      alert("Mic track not ready yet");
+      return;
+    }
+
+    await track.setEnabled(!micOn);
+    setMicOn(!micOn);
+
+    console.log("Mic changed to:", !micOn);
   }
-
-  await micTrack.setEnabled(!micOn);
-  setMicOn(!micOn);
-
-  console.log("Mic changed to:", !micOn);
-}
 
   function handleSend() {
     if (!chatText.trim()) return;
@@ -91,10 +108,14 @@ export default function RoomModal({
     setChatText("");
   }
 
+  function handleClose() {
+    setJoinedRoom(null);
+  }
+
   return (
     <div className="modal">
       <div className="roomPanel">
-        <button className="close" onClick={setJoinedRoom}>
+        <button className="close" onClick={handleClose}>
           ×
         </button>
 
@@ -109,7 +130,7 @@ export default function RoomModal({
             roomUsers.map((item) => (
               <div className="micSeat" key={item.id}>
                 <div className="micAvatar">
-                  {item.name[0]}
+                  {item.name?.[0] || "?"}
                 </div>
 
                 <span>{item.name}</span>
