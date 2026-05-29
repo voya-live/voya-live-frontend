@@ -115,10 +115,25 @@ function App() {
   function joinRoom(room) {
   const roomId = String(room._id || room.id);
 
+  let agoraUid = localStorage.getItem("agoraUid");
+
+  if (!agoraUid) {
+    agoraUid = String(
+      Math.floor(Math.random() * 1000000)
+    );
+
+    localStorage.setItem(
+      "agoraUid",
+      agoraUid
+    );
+  }
+
   setJoinedRoom(room);
 
   socket.emit("room:join", {
     roomId,
+    agoraUid: Number(agoraUid),
+
     user: {
       id: user.phone,
       name: user.name,
