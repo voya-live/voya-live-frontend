@@ -1,0 +1,69 @@
+import React, { useState } from "react";
+import WalletBox from "./WalletBox";
+
+export default function HomePage({
+  rooms,
+  coins,
+  recharge,
+  setJoinedRoom,
+  liveRooms,
+  createRoom,
+}) {
+  const [roomName, setRoomName] = useState("");
+
+  function handleCreateRoom() {
+    if (!roomName.trim()) {
+      return alert("Enter room name");
+    }
+
+    createRoom(roomName);
+    setRoomName("");
+  }
+
+  return (
+    <section className="content">
+      <div className="topbar">
+        <input placeholder="Search rooms or hosts..." />
+        <button className="loginBtn">VIP Upgrade</button>
+      </div>
+
+      <div className="hero">
+        <h2>Feel the Voice</h2>
+        <p>Create or join live voice rooms in real time.</p>
+
+        <div className="createRoomBox">
+          <input
+            placeholder="Enter new room name..."
+            value={roomName}
+            onChange={(e) => setRoomName(e.target.value)}
+          />
+          <button onClick={handleCreateRoom}>Start Room</button>
+        </div>
+      </div>
+
+      <WalletBox coins={coins} recharge={recharge} />
+
+      <h2 className="sectionTitle">Live Rooms</h2>
+
+      <div className="roomGrid">
+        {rooms.map((room) => {
+          const liveCount = liveRooms[String(room.id)]?.users?.length || 0;
+
+          return (
+            <div className="roomCard" key={room.id}>
+              <div className="liveBadge">LIVE</div>
+              <span className="tag">{room.tag}</span>
+              <h3>{room.name}</h3>
+              <p>Host: {room.host}</p>
+
+              <div className="roomFooter">
+                <span>{liveCount} live now</span>
+                <button onClick={() => setJoinedRoom(room)}>Join</button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
