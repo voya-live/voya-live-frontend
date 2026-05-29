@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AgoraRTC from "agora-rtc-sdk-ng";
 
-const appId = "YOUR_AGORA_APP_ID_HERE";
+const appId = "0408a7d6547447dda62aec167d720c9b";
 
 const client = AgoraRTC.createClient({
   mode: "rtc",
@@ -71,11 +71,18 @@ export default function RoomModal({
     liveRooms[String(joinedRoom._id || joinedRoom.id)]?.users || [];
 
   async function toggleMic() {
-    if (!micTrack) return;
+  console.log("Toggle clicked. micTrack =", micTrack, "micOn =", micOn);
 
-    await micTrack.setEnabled(!micOn);
-    setMicOn(!micOn);
+  if (!micTrack) {
+    alert("Mic track not ready yet");
+    return;
   }
+
+  await micTrack.setEnabled(!micOn);
+  setMicOn(!micOn);
+
+  console.log("Mic changed to:", !micOn);
+}
 
   function handleSend() {
     if (!chatText.trim()) return;
