@@ -11,6 +11,20 @@ const client = AgoraRTC.createClient({
   codec: "vp8",
 });
 
+function makeNumericUid(rawId) {
+  if (!rawId) return null;
+
+  let hash = 0;
+  const str = String(rawId);
+
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+
+  return Math.abs(hash);
+}
+
 function getNumericUid() {
   const storedUser =
     localStorage.getItem("user") ||
@@ -20,18 +34,9 @@ function getNumericUid() {
     try {
       const parsed = JSON.parse(storedUser);
       const rawId = parsed._id || parsed.id || parsed.userId;
+      const uid = makeNumericUid(rawId);
 
-      if (rawId) {
-        let hash = 0;
-        const str = String(rawId);
-
-        for (let i = 0; i < str.length; i++) {
-          hash = (hash << 5) - hash + str.charCodeAt(i);
-          hash |= 0;
-        }
-
-        return Math.abs(hash);
-      }
+      if (uid) return uid;
     } catch {
       // ignore
     }
@@ -39,9 +44,7 @@ function getNumericUid() {
 
   const savedUid = localStorage.getItem("agoraUid");
 
-  if (savedUid) {
-    return Number(savedUid);
-  }
+  if (savedUid) return Number(savedUid);
 
   const newUid = Math.floor(Math.random() * 1000000);
   localStorage.setItem("agoraUid", String(newUid));
@@ -63,7 +66,6 @@ export default function RoomModal({
   const [activeSpeakers, setActiveSpeakers] = useState([]);
 
   const micRef = useRef(null);
-  const agoraUidRef = useRef(null);
 
   useEffect(() => {
     if (!joinedRoom) return;
@@ -92,7 +94,6 @@ export default function RoomModal({
         });
 
         const uid = getNumericUid();
-        agoraUidRef.current = uid;
 
         const tokenRes = await fetch(
           `${backendUrl}/api/agora/token?channelName=${encodeURIComponent(
@@ -176,9 +177,9 @@ export default function RoomModal({
   }
 
   function isUserSpeaking(item) {
-    const uid = String(item.agoraUid || item.id || item._id);
+    const uid = makeNumericUid(item.id || item._id || item.userId);
 
-    return activeSpeakers.includes(uid);
+    return activeSpeakers.includes(String(uid));
   }
 
   return (
