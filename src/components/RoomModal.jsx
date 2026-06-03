@@ -34,6 +34,7 @@ export default function RoomModal({
   clearHand,
   approveSpeaker,
   removeSpeaker,
+  hostMuteUser,
   roomSpeakers,
   currentUser,
 }) {
@@ -58,6 +59,8 @@ export default function RoomModal({
   const currentSpeaker = roomSpeakers.find(
     (item) => item.id === currentUser?.phone
   );
+
+  const isHostMuted = currentSpeaker?.muted || false;
 
   const canSpeak =
     isCurrentUserHost || Boolean(currentSpeaker);
@@ -164,6 +167,17 @@ export default function RoomModal({
     updatePublishing();
   }, [canSpeak, isAgoraJoined]);
 
+  useEffect(() => {
+    async function applyHostMute() {
+      if (!micRef.current) return;
+
+      await micRef.current.setEnabled(!isHostMuted);
+      setMicOn(!isHostMuted);
+    }
+
+    applyHostMute();
+  }, [isHostMuted]);
+
   if (!joinedRoom) return null;
 
   async function toggleMic() {
@@ -171,6 +185,11 @@ export default function RoomModal({
 
     if (!canSpeak) {
       alert("You need host approval to speak.");
+      return;
+    }
+
+    if (isHostMuted) {
+      alert("You have been muted by the host.");
       return;
     }
 
@@ -213,8 +232,12 @@ export default function RoomModal({
     return activeSpeakers.includes(String(item.agoraUid));
   }
 
+  function getSpeaker(item) {
+    return roomSpeakers.find((speaker) => speaker.id === item.id);
+  }
+
   function isRoomSpeaker(item) {
-    return roomSpeakers.some((speaker) => speaker.id === item.id);
+    return Boolean(getSpeaker(item));
   }
 
   return (
@@ -230,45 +253,65 @@ export default function RoomModal({
 
         <div className="micGrid">
           {roomUsers.length > 0 ? (
-            roomUsers.map((item) => (
-              <div
-                className={
-                  isUserSpeaking(item)
-                    ? "micSeat activeSpeaker"
-                    : "micSeat"
-                }
-                key={item.id}
-              >
-                <div className="micAvatar">
-                  {item.name?.[0] || "U"}
+            roomUsers.map((item) => {
+              const speaker = getSpeaker(item);
+              const muted = speaker?.muted || false;
+
+              return (
+                <div
+                  className={
+                    isUserSpeaking(item)
+                      ? "micSeat activeSpeaker"
+                      : "micSeat"
+                  }
+                  key={item.id}
+                >
+                  <div className="micAvatar">
+                    {item.name?.[0] || "U"}
+                  </div>
+
+                  <span>
+                    {item.name}
+
+                    {item.isHost && (
+                      <div className="hostBadge">
+                        👑 Host
+                      </div>
+                    )}
+
+                    {isRoomSpeaker(item) && !item.isHost && (
+                      <div className="speakerBadge">
+                        🎤 Speaker
+                      </div>
+                    )}
+
+                    {muted && (
+                      <div className="mutedBadge">
+                        🔇 Muted
+                      </div>
+                    )}
+                  </span>
+
+                  {isCurrentUserHost && !item.isHost && isRoomSpeaker(item) && (
+                    <div className="hostControls">
+                      <button
+                        className="smallControlBtn"
+                        onClick={() => hostMuteUser(item.id, !muted)}
+                      >
+                        {muted ? "Unmute" : "Mute"}
+                      </button>
+
+                      <button
+                        className="smallControlBtn"
+                        onClick={() => removeSpeaker(item.id)}
+                      >
+                        Remove Mic
+                      </button>
+                    </div>
+                  )}
                 </div>
-
-                <span>
-                  {item.name}
-
-                  {item.isHost && (
-                    <div className="hostBadge">
-                      👑 Host
-                    </div>
-                  )}
-
-                  {isRoomSpeaker(item) && !item.isHost && (
-                    <div className="speakerBadge">
-                      🎤 Speaker
-                    </div>
-                  )}
-                </span>
-
-                {isCurrentUserHost && !item.isHost && isRoomSpeaker(item) && (
-                  <button
-                    className="smallControlBtn"
-                    onClick={() => removeSpeaker(item.id)}
-                  >
-                    Remove Mic
-                  </button>
-                )}
-              </div>
-            ))
+              );
+            })
           ) : (
             <div className="micSeat">
               <div className="micAvatar">?</div>
@@ -284,9 +327,15 @@ export default function RoomModal({
             </button>
           )}
 
-          {!isCurrentUserHost && canSpeak && (
+          {!isCurrentUserHost && canSpeak && !isHostMuted && (
             <p className="speakerApproved">
               🎤 You are approved to speak
+            </p>
+          )}
+
+          {!isCurrentUserHost && canSpeak && isHostMuted && (
+            <p className="mutedNotice">
+              🔇 You are muted by the host
             </p>
           )}
 
@@ -341,11 +390,13 @@ export default function RoomModal({
             onClick={toggleMic}
             className={micOn ? "micBtn active" : "micBtn muted"}
           >
-            {canSpeak
-              ? micOn
-                ? "Mic On"
-                : "Mic Off"
-              : "Listener"}
+            {!canSpeak
+              ? "Listener"
+              : isHostMuted
+              ? "Muted by Host"
+              : micOn
+              ? "Mic On"
+              : "Mic Off"}
           </button>
 
           <button onClick={sendGift}>🌹 Rose -20</button>

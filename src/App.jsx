@@ -198,6 +198,18 @@ function App() {
     });
   }
 
+  function hostMuteUser(userId, muted) {
+    if (!joinedRoom) return;
+
+    const roomId = String(joinedRoom._id || joinedRoom.id);
+
+    socket.emit("room:hostMuteUser", {
+      roomId,
+      userId,
+      muted,
+    });
+  }
+
   function raiseHand() {
     if (!joinedRoom || !user) return;
 
@@ -338,6 +350,7 @@ function App() {
         clearHand={clearHand}
         approveSpeaker={approveSpeaker}
         removeSpeaker={removeSpeaker}
+        hostMuteUser={hostMuteUser}
         roomSpeakers={roomSpeakers}
         currentUser={user}
       />
