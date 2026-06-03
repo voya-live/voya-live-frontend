@@ -41,6 +41,7 @@ export default function RoomModal({
   const [micTrack, setMicTrack] = useState(null);
   const [micOn, setMicOn] = useState(false);
   const [activeSpeakers, setActiveSpeakers] = useState([]);
+  const [isAgoraJoined, setIsAgoraJoined] = useState(false);
 
   const micRef = useRef(null);
   const joinedRef = useRef(false);
@@ -101,7 +102,9 @@ export default function RoomModal({
         }
 
         await client.join(appId, channelName, tokenData.token, uid);
+
         joinedRef.current = true;
+        setIsAgoraJoined(true);
       } catch {
         alert("Voice connection error. Please try again.");
       }
@@ -118,6 +121,7 @@ export default function RoomModal({
 
       setMicTrack(null);
       setMicOn(false);
+      setIsAgoraJoined(false);
       joinedRef.current = false;
 
       client.removeAllListeners();
@@ -127,7 +131,7 @@ export default function RoomModal({
 
   useEffect(() => {
     async function updatePublishing() {
-      if (!joinedRef.current) return;
+      if (!joinedRef.current || !isAgoraJoined) return;
 
       try {
         if (canSpeak && !micRef.current) {
@@ -157,7 +161,7 @@ export default function RoomModal({
     }
 
     updatePublishing();
-  }, [canSpeak]);
+  }, [canSpeak, isAgoraJoined]);
 
   if (!joinedRoom) return null;
 
