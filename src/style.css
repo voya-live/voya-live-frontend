@@ -380,3 +380,42 @@ input {
   display: flex;
   gap: 8px;
 }
+.stageSection {
+  margin: 22px 0;
+}
+
+.stageSection h4 {
+  margin: 0 0 12px;
+  color: #c084fc;
+}
+
+.audienceSection {
+  border-top: 1px solid #29345f;
+  padding-top: 18px;
+}
+
+.audienceGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.audienceUser {
+  background: #1d2750;
+  padding: 10px 12px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.audienceAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #64748b, #94a3b8);
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: bold;
+}

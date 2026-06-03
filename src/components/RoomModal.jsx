@@ -50,6 +50,14 @@ export default function RoomModal({
   const roomUsers =
     liveRooms[String(joinedRoom?._id || joinedRoom?.id)]?.users || [];
 
+  const hostUsers = roomUsers.filter((item) => item.isHost);
+  const speakerUsers = roomUsers.filter(
+    (item) => !item.isHost && isRoomSpeaker(item)
+  );
+  const audienceUsers = roomUsers.filter(
+    (item) => !item.isHost && !isRoomSpeaker(item)
+  );
+
   const currentRoomUser = roomUsers.find(
     (item) => item.id === currentUser?.phone
   );
@@ -62,8 +70,7 @@ export default function RoomModal({
 
   const isHostMuted = currentSpeaker?.muted || false;
 
-  const canSpeak =
-    isCurrentUserHost || Boolean(currentSpeaker);
+  const canSpeak = isCurrentUserHost || Boolean(currentSpeaker);
 
   useEffect(() => {
     if (!joinedRoom) return;
@@ -240,6 +247,66 @@ export default function RoomModal({
     return Boolean(getSpeaker(item));
   }
 
+  function renderUserCard(item) {
+    const speaker = getSpeaker(item);
+    const muted = speaker?.muted || false;
+
+    return (
+      <div
+        className={
+          isUserSpeaking(item)
+            ? "micSeat activeSpeaker"
+            : "micSeat"
+        }
+        key={item.id}
+      >
+        <div className="micAvatar">
+          {item.name?.[0] || "U"}
+        </div>
+
+        <span>
+          {item.name}
+
+          {item.isHost && (
+            <div className="hostBadge">
+              👑 Host
+            </div>
+          )}
+
+          {isRoomSpeaker(item) && !item.isHost && (
+            <div className="speakerBadge">
+              🎤 Speaker
+            </div>
+          )}
+
+          {muted && (
+            <div className="mutedBadge">
+              🔇 Muted
+            </div>
+          )}
+        </span>
+
+        {isCurrentUserHost && !item.isHost && isRoomSpeaker(item) && (
+          <div className="hostControls">
+            <button
+              className="smallControlBtn"
+              onClick={() => hostMuteUser(item.id, !muted)}
+            >
+              {muted ? "Unmute" : "Mute"}
+            </button>
+
+            <button
+              className="smallControlBtn"
+              onClick={() => removeSpeaker(item.id)}
+            >
+              Remove Mic
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="modal">
       <div className="roomPanel">
@@ -251,73 +318,50 @@ export default function RoomModal({
         <p>Hosted by {joinedRoom.host}</p>
         <p>{roomUsers.length} users live now</p>
 
-        <div className="micGrid">
-          {roomUsers.length > 0 ? (
-            roomUsers.map((item) => {
-              const speaker = getSpeaker(item);
-              const muted = speaker?.muted || false;
+        <div className="stageSection">
+          <h4>Host</h4>
+          <div className="micGrid">
+            {hostUsers.length > 0 ? (
+              hostUsers.map((item) => renderUserCard(item))
+            ) : (
+              <div className="micSeat">
+                <div className="micAvatar">?</div>
+                <span>No host online</span>
+              </div>
+            )}
+          </div>
+        </div>
 
-              return (
-                <div
-                  className={
-                    isUserSpeaking(item)
-                      ? "micSeat activeSpeaker"
-                      : "micSeat"
-                  }
-                  key={item.id}
-                >
-                  <div className="micAvatar">
+        <div className="stageSection">
+          <h4>Speakers</h4>
+          <div className="micGrid">
+            {speakerUsers.length > 0 ? (
+              speakerUsers.map((item) => renderUserCard(item))
+            ) : (
+              <div className="micSeat">
+                <div className="micAvatar">🎤</div>
+                <span>No speakers yet</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="stageSection audienceSection">
+          <h4>Audience</h4>
+          <div className="audienceGrid">
+            {audienceUsers.length > 0 ? (
+              audienceUsers.map((item) => (
+                <div className="audienceUser" key={item.id}>
+                  <div className="audienceAvatar">
                     {item.name?.[0] || "U"}
                   </div>
-
-                  <span>
-                    {item.name}
-
-                    {item.isHost && (
-                      <div className="hostBadge">
-                        👑 Host
-                      </div>
-                    )}
-
-                    {isRoomSpeaker(item) && !item.isHost && (
-                      <div className="speakerBadge">
-                        🎤 Speaker
-                      </div>
-                    )}
-
-                    {muted && (
-                      <div className="mutedBadge">
-                        🔇 Muted
-                      </div>
-                    )}
-                  </span>
-
-                  {isCurrentUserHost && !item.isHost && isRoomSpeaker(item) && (
-                    <div className="hostControls">
-                      <button
-                        className="smallControlBtn"
-                        onClick={() => hostMuteUser(item.id, !muted)}
-                      >
-                        {muted ? "Unmute" : "Mute"}
-                      </button>
-
-                      <button
-                        className="smallControlBtn"
-                        onClick={() => removeSpeaker(item.id)}
-                      >
-                        Remove Mic
-                      </button>
-                    </div>
-                  )}
+                  <span>{item.name}</span>
                 </div>
-              );
-            })
-          ) : (
-            <div className="micSeat">
-              <div className="micAvatar">?</div>
-              <span>No users yet</span>
-            </div>
-          )}
+              ))
+            ) : (
+              <p className="emptyHands">No audience yet</p>
+            )}
+          </div>
         </div>
 
         <div className="raiseHandArea">
