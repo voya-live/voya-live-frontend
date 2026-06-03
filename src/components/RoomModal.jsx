@@ -51,9 +51,11 @@ export default function RoomModal({
     liveRooms[String(joinedRoom?._id || joinedRoom?.id)]?.users || [];
 
   const hostUsers = roomUsers.filter((item) => item.isHost);
+
   const speakerUsers = roomUsers.filter(
     (item) => !item.isHost && isRoomSpeaker(item)
   );
+
   const audienceUsers = roomUsers.filter(
     (item) => !item.isHost && !isRoomSpeaker(item)
   );
@@ -333,7 +335,7 @@ export default function RoomModal({
         </div>
 
         <div className="stageSection">
-          <h4>Speakers</h4>
+          <h4>Speakers ({speakerUsers.length}/8)</h4>
           <div className="micGrid">
             {speakerUsers.length > 0 ? (
               speakerUsers.map((item) => renderUserCard(item))

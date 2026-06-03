@@ -45,6 +45,10 @@ function App() {
       setRoomSpeakers(data || []);
     });
 
+    socket.on("room:error", (data) => {
+      alert(data?.message || "Room error");
+    });
+
     loadRooms();
     loadWalletBalance();
 
@@ -53,6 +57,7 @@ function App() {
       socket.off("room:chat");
       socket.off("room:handRequests");
       socket.off("room:speakersUpdate");
+      socket.off("room:error");
     };
   }, []);
 
