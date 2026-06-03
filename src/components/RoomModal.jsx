@@ -59,7 +59,8 @@ export default function RoomModal({
     (item) => item.id === currentUser?.phone
   );
 
-  const canSpeak = Boolean(currentSpeaker);
+  const canSpeak =
+    isCurrentUserHost || Boolean(currentSpeaker);
 
   useEffect(() => {
     if (!joinedRoom) return;
