@@ -224,7 +224,7 @@ input {
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.7);
+  background: rgba(0, 0, 0, 0.7);
   display: grid;
   place-items: center;
 }
@@ -265,6 +265,28 @@ input {
   gap: 12px;
 }
 
+/* Voice Room UI */
+.micBtn.active {
+  background: #b985ff;
+  color: #000;
+}
+
+.micBtn.muted {
+  background: #444;
+  color: #fff;
+}
+
+.activeSpeaker .micAvatar {
+  box-shadow: 0 0 0 4px rgba(185, 133, 255, 0.35);
+}
+
+.hostBadge {
+  margin-top: 4px;
+  font-size: 11px;
+  color: gold;
+  font-weight: 700;
+}
+
 /* Mobile */
 @media (max-width: 800px) {
   .app {
@@ -282,16 +304,4 @@ input {
   .roomPanel {
     width: 90%;
   }
-}
-.micBtn.active {
-  background: #b985ff;
-  color: #000;
-}
-
-.micBtn.muted {
-  background: #444;
-  color: #fff;
-}
-.activeSpeaker .micAvatar {
-  box-shadow: 0 0 0 4px rgba(185, 133, 255, 0.35);
 }

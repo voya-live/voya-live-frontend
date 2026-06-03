@@ -11,37 +11,7 @@ const client = AgoraRTC.createClient({
   codec: "vp8",
 });
 
-function makeNumericUid(rawId) {
-  if (!rawId) return null;
-
-  let hash = 0;
-  const str = String(rawId);
-
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash << 5) - hash + str.charCodeAt(i);
-    hash |= 0;
-  }
-
-  return Math.abs(hash);
-}
-
 function getNumericUid() {
-  const storedUser =
-    localStorage.getItem("user") ||
-    localStorage.getItem("currentUser");
-
-  if (storedUser) {
-    try {
-      const parsed = JSON.parse(storedUser);
-      const rawId = parsed._id || parsed.id || parsed.userId;
-      const uid = makeNumericUid(rawId);
-
-      if (uid) return uid;
-    } catch {
-      // ignore
-    }
-  }
-
   const savedUid = localStorage.getItem("agoraUid");
 
   if (savedUid) return Number(savedUid);
@@ -177,10 +147,10 @@ export default function RoomModal({
   }
 
   function isUserSpeaking(item) {
-  if (!item.agoraUid) return false;
+    if (!item.agoraUid) return false;
 
-  return activeSpeakers.includes(String(item.agoraUid));
-}
+    return activeSpeakers.includes(String(item.agoraUid));
+  }
 
   return (
     <div className="modal">
@@ -207,7 +177,16 @@ export default function RoomModal({
                 <div className="micAvatar">
                   {item.name?.[0] || "U"}
                 </div>
-                <span>{item.name}</span>
+
+                <span>
+                  {item.name}
+
+                  {item.isHost && (
+                    <div className="hostBadge">
+                      👑 Host
+                    </div>
+                  )}
+                </span>
               </div>
             ))
           ) : (
