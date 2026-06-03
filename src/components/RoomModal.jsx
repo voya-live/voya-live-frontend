@@ -51,6 +51,7 @@ export default function RoomModal({
   const [micOn, setMicOn] = useState(false);
   const [activeSpeakers, setActiveSpeakers] = useState([]);
   const [isAgoraJoined, setIsAgoraJoined] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const micRef = useRef(null);
   const joinedRef = useRef(false);
@@ -143,6 +144,7 @@ export default function RoomModal({
       setMicTrack(null);
       setMicOn(false);
       setIsAgoraJoined(false);
+      setSelectedUser(null);
       joinedRef.current = false;
 
       client.removeAllListeners();
@@ -257,6 +259,21 @@ export default function RoomModal({
     return Boolean(getSpeaker(item));
   }
 
+  function getUserRole(item) {
+    if (item.isHost) return "Host";
+    if (isRoomSpeaker(item)) return "Speaker";
+    return "Audience";
+  }
+
+  function getUserStatus(item) {
+    const speaker = getSpeaker(item);
+
+    if (speaker?.muted) return "Muted by host";
+    if (isUserSpeaking(item)) return "Speaking now";
+    if (isRoomSpeaker(item)) return "Can speak";
+    return "Listening";
+  }
+
   function getGiftAnimationClass(gift) {
     if (!gift) return "";
 
@@ -265,6 +282,10 @@ export default function RoomModal({
     if (gift.giftName === "Crown") return "giftOverlay crownAnimation";
 
     return "giftOverlay";
+  }
+
+  function openProfile(item) {
+    setSelectedUser(item);
   }
 
   function renderUserCard(item) {
@@ -279,6 +300,7 @@ export default function RoomModal({
             : "micSeat"
         }
         key={item.id}
+        onClick={() => openProfile(item)}
       >
         <div className="micAvatar">
           {item.name?.[0] || "U"}
@@ -307,7 +329,10 @@ export default function RoomModal({
         </span>
 
         {isCurrentUserHost && !item.isHost && isRoomSpeaker(item) && (
-          <div className="hostControls">
+          <div
+            className="hostControls"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               className="smallControlBtn"
               onClick={() => hostMuteUser(item.id, !muted)}
@@ -337,6 +362,36 @@ export default function RoomModal({
             </div>
             <div className="giftBigText">
               {giftAnimation.text}
+            </div>
+          </div>
+        )}
+
+        {selectedUser && (
+          <div className="profilePopup">
+            <div className="profileCard">
+              <button
+                className="profileClose"
+                onClick={() => setSelectedUser(null)}
+              >
+                ×
+              </button>
+
+              <div className="profileAvatar">
+                {selectedUser.name?.[0] || "U"}
+              </div>
+
+              <h3>{selectedUser.name}</h3>
+
+              <p>Role: {getUserRole(selectedUser)}</p>
+              <p>Status: {getUserStatus(selectedUser)}</p>
+              <p>User ID: {selectedUser.id}</p>
+
+              <button
+                className="profileActionBtn"
+                onClick={() => setSelectedUser(null)}
+              >
+                Close
+              </button>
             </div>
           </div>
         )}
@@ -392,7 +447,11 @@ export default function RoomModal({
           <div className="audienceGrid">
             {audienceUsers.length > 0 ? (
               audienceUsers.map((item) => (
-                <div className="audienceUser" key={item.id}>
+                <div
+                  className="audienceUser"
+                  key={item.id}
+                  onClick={() => openProfile(item)}
+                >
                   <div className="audienceAvatar">
                     {item.name?.[0] || "U"}
                   </div>
