@@ -437,3 +437,81 @@ input {
   font-size: 13px;
   font-weight: 700;
 }
+.giftOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  text-align: center;
+}
+
+.giftBigIcon {
+  font-size: 82px;
+}
+
+.giftBigText {
+  margin-top: 10px;
+  background: rgba(17, 23, 53, 0.85);
+  padding: 10px 16px;
+  border-radius: 16px;
+  color: #facc15;
+  font-weight: 800;
+}
+
+.roseAnimation {
+  animation: roseFly 2.5s ease forwards;
+}
+
+.diamondAnimation {
+  animation: diamondPop 2.5s ease forwards;
+}
+
+.crownAnimation {
+  animation: crownShow 2.5s ease forwards;
+}
+
+@keyframes roseFly {
+  0% {
+    transform: translateY(220px) scale(0.7);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-220px) scale(1.2);
+    opacity: 0;
+  }
+}
+
+@keyframes diamondPop {
+  0% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  30% {
+    transform: scale(1.4);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes crownShow {
+  0% {
+    transform: scale(0.4) rotate(-12deg);
+    opacity: 0;
+  }
+  35% {
+    transform: scale(1.4) rotate(8deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 0;
+  }
+}

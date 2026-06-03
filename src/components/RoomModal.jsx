@@ -43,6 +43,7 @@ export default function RoomModal({
   hostMuteUser,
   roomSpeakers,
   giftFeed,
+  giftAnimation,
   currentUser,
 }) {
   const [chatText, setChatText] = useState("");
@@ -256,6 +257,16 @@ export default function RoomModal({
     return Boolean(getSpeaker(item));
   }
 
+  function getGiftAnimationClass(gift) {
+    if (!gift) return "";
+
+    if (gift.giftName === "Rose") return "giftOverlay roseAnimation";
+    if (gift.giftName === "Diamond") return "giftOverlay diamondAnimation";
+    if (gift.giftName === "Crown") return "giftOverlay crownAnimation";
+
+    return "giftOverlay";
+  }
+
   function renderUserCard(item) {
     const speaker = getSpeaker(item);
     const muted = speaker?.muted || false;
@@ -319,6 +330,17 @@ export default function RoomModal({
   return (
     <div className="modal">
       <div className="roomPanel">
+        {giftAnimation && (
+          <div className={getGiftAnimationClass(giftAnimation)}>
+            <div className="giftBigIcon">
+              {giftAnimation.giftIcon}
+            </div>
+            <div className="giftBigText">
+              {giftAnimation.text}
+            </div>
+          </div>
+        )}
+
         <button className="close" onClick={closeRoom}>
           ×
         </button>

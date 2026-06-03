@@ -24,6 +24,7 @@ function App() {
   const [handRequests, setHandRequests] = useState([]);
   const [roomSpeakers, setRoomSpeakers] = useState([]);
   const [giftFeed, setGiftFeed] = useState([]);
+  const [giftAnimation, setGiftAnimation] = useState(null);
   const [authMode, setAuthMode] = useState("login");
   const [form, setForm] = useState({
     name: "",
@@ -52,6 +53,11 @@ function App() {
 
     socket.on("room:gift", (gift) => {
       setGiftFeed((prev) => [gift, ...prev].slice(0, 10));
+      setGiftAnimation(gift);
+
+      setTimeout(() => {
+        setGiftAnimation(null);
+      }, 2500);
     });
 
     loadRooms();
@@ -183,6 +189,7 @@ function App() {
     setHandRequests([]);
     setRoomSpeakers([]);
     setGiftFeed([]);
+    setGiftAnimation(null);
 
     socket.emit("room:join", {
       roomId,
@@ -385,6 +392,7 @@ function App() {
         hostMuteUser={hostMuteUser}
         roomSpeakers={roomSpeakers}
         giftFeed={giftFeed}
+        giftAnimation={giftAnimation}
         currentUser={user}
       />
     </main>
