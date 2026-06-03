@@ -9,21 +9,30 @@ import Sidebar from "./components/Sidebar";
 import HomePage from "./components/HomePage";
 import RoomModal from "./components/RoomModal";
 
-const socket = io("https://voya-live-backend.onrender.com");
+const backendUrl = "https://voya-live-backend.onrender.com";
+const socket = io(backendUrl);
 
 function App() {
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("voya_user")) || null);
+  const [user, setUser] = useState(
+    JSON.parse(localStorage.getItem("voya_user")) || null
+  );
   const [coins, setCoins] = useState(0);
   const [joinedRoom, setJoinedRoom] = useState(null);
   const [rooms, setRooms] = useState([]);
   const [liveRooms, setLiveRooms] = useState({});
   const [messages, setMessages] = useState([]);
   const [authMode, setAuthMode] = useState("login");
-  const [form, setForm] = useState({ name: "", phone: "", password: "" });
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    password: "",
+  });
 
   useEffect(() => {
     socket.on("rooms:update", (data) => setLiveRooms(data || {}));
-    socket.on("room:chat", (message) => setMessages((prev) => [...prev, message]));
+    socket.on("room:chat", (message) =>
+      setMessages((prev) => [...prev, message])
+    );
 
     loadRooms();
     loadWalletBalance();
@@ -36,7 +45,7 @@ function App() {
 
   async function loadRooms() {
     try {
-      const response = await fetch("https://voya-live-backend.onrender.com/api/rooms");
+      const response = await fetch(`${backendUrl}/api/rooms`);
       const data = await response.json();
       setRooms(data.rooms || []);
     } catch {
@@ -49,24 +58,33 @@ function App() {
     if (!token) return;
 
     try {
-      const response = await fetch("https://voya-live-backend.onrender.com/api/wallet/balance", {
+      const response = await fetch(`${backendUrl}/api/wallet/balance`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       const data = await response.json();
-      if (response.ok) setCoins(data.coins || 0);
+
+      if (response.ok) {
+        setCoins(data.coins || 0);
+      }
     } catch {
       console.log("Wallet balance error");
     }
   }
 
   async function handleAuth() {
-    if (!form.phone || !form.password) return alert("Enter phone and password");
-    if (authMode === "register" && !form.name) return alert("Enter your name");
+    if (!form.phone || !form.password) {
+      return alert("Enter phone and password");
+    }
+
+    if (authMode === "register" && !form.name) {
+      return alert("Enter your name");
+    }
 
     const endpoint =
       authMode === "login"
-        ? "https://voya-live-backend.onrender.com/api/auth/login"
-        : "https://voya-live-backend.onrender.com/api/auth/register";
+        ? `${backendUrl}/api/auth/login`
+        : `${backendUrl}/api/auth/register`;
 
     try {
       const response = await fetch(endpoint, {
@@ -76,13 +94,17 @@ function App() {
       });
 
       const data = await response.json();
-      if (!response.ok) return alert(data.error || "Authentication failed");
+
+      if (!response.ok) {
+        return alert(data.error || "Authentication failed");
+      }
 
       localStorage.setItem("voya_token", data.token);
       localStorage.setItem("voya_user", JSON.stringify(data.user));
 
       setUser({ ...data.user, level: 1 });
       setCoins(data.user.coins || 0);
+
       loadWalletBalance();
     } catch {
       alert("Backend connection error");
@@ -93,17 +115,23 @@ function App() {
     const token = localStorage.getItem("voya_token");
 
     try {
-      const response = await fetch("https://voya-live-backend.onrender.com/api/rooms", {
+      const response = await fetch(`${backendUrl}/api/rooms`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: roomName, tag: "Live" }),
+        body: JSON.stringify({
+          name: roomName,
+          tag: "Live",
+        }),
       });
 
       const data = await response.json();
-      if (!response.ok) return alert(data.error || "Failed to create room");
+
+      if (!response.ok) {
+        return alert(data.error || "Failed to create room");
+      }
 
       setRooms((prev) => [data.room, ...prev]);
       joinRoom(data.room);
@@ -112,54 +140,54 @@ function App() {
     }
   }
 
-  function joinRoom(room) {
-  const roomId = String(room._id || room.id);
+  function getAgoraUid() {
+    let agoraUid = localStorage.getItem("agoraUid");
 
-  let agoraUid = localStorage.getItem("agoraUid");
+    if (!agoraUid) {
+      agoraUid = String(Math.floor(Math.random() * 1000000));
+      localStorage.setItem("agoraUid", agoraUid);
+    }
 
-  if (!agoraUid) {
-    agoraUid = String(
-      Math.floor(Math.random() * 1000000)
-    );
-
-    localStorage.setItem(
-      "agoraUid",
-      agoraUid
-    );
+    return Number(agoraUid);
   }
 
-  setJoinedRoom(room);
+  function joinRoom(room) {
+    const roomId = String(room._id || room.id);
+    const agoraUid = getAgoraUid();
 
-  socket.emit("room:join", {
-    roomId,
-    agoraUid: Number(agoraUid),
+    setJoinedRoom(room);
 
-    user: {
-      id: user.phone,
-      name: user.name,
-    },
-  });
-}
+    socket.emit("room:join", {
+      roomId,
+      agoraUid,
+
+      user: {
+        id: user.phone,
+        name: user.name,
+        isHost: room.host === user.name,
+      },
+    });
+  }
 
   function sendMessage(text) {
-  if (!joinedRoom || !user) return;
+    if (!joinedRoom || !user) return;
 
-  const roomId = String(joinedRoom._id || joinedRoom.id);
+    const roomId = String(joinedRoom._id || joinedRoom.id);
 
-  socket.emit("room:chat", {
-    roomId,
-    user: {
-      name: user.name,
-    },
-    message: text,
-  });
-}
+    socket.emit("room:chat", {
+      roomId,
+      user: {
+        name: user.name,
+      },
+      message: text,
+    });
+  }
 
   async function recharge() {
     const token = localStorage.getItem("voya_token");
 
     try {
-      const response = await fetch("https://voya-live-backend.onrender.com/api/wallet/recharge", {
+      const response = await fetch(`${backendUrl}/api/wallet/recharge`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -169,7 +197,10 @@ function App() {
       });
 
       const data = await response.json();
-      if (!response.ok) return alert(data.error || "Recharge failed");
+
+      if (!response.ok) {
+        return alert(data.error || "Recharge failed");
+      }
 
       setCoins(data.coins);
     } catch {
@@ -181,7 +212,7 @@ function App() {
     const token = localStorage.getItem("voya_token");
 
     try {
-      const response = await fetch("https://voya-live-backend.onrender.com/api/wallet/gift", {
+      const response = await fetch(`${backendUrl}/api/wallet/gift`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -191,7 +222,10 @@ function App() {
       });
 
       const data = await response.json();
-      if (!response.ok) return alert(data.error || "Gift failed");
+
+      if (!response.ok) {
+        return alert(data.error || "Gift failed");
+      }
 
       setCoins(data.coins);
     } catch {
