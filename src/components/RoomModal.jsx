@@ -32,14 +32,18 @@ export default function RoomModal({
   handRequests,
   raiseHand,
   clearHand,
+  approveSpeaker,
+  removeSpeaker,
+  roomSpeakers,
   currentUser,
 }) {
   const [chatText, setChatText] = useState("");
   const [micTrack, setMicTrack] = useState(null);
-  const [micOn, setMicOn] = useState(true);
+  const [micOn, setMicOn] = useState(false);
   const [activeSpeakers, setActiveSpeakers] = useState([]);
 
   const micRef = useRef(null);
+  const joinedRef = useRef(false);
 
   const roomUsers =
     liveRooms[String(joinedRoom?._id || joinedRoom?.id)]?.users || [];
@@ -49,6 +53,12 @@ export default function RoomModal({
   );
 
   const isCurrentUserHost = currentRoomUser?.isHost || false;
+
+  const currentSpeaker = roomSpeakers.find(
+    (item) => item.id === currentUser?.phone
+  );
+
+  const canSpeak = Boolean(currentSpeaker);
 
   useEffect(() => {
     if (!joinedRoom) return;
@@ -91,15 +101,7 @@ export default function RoomModal({
         }
 
         await client.join(appId, channelName, tokenData.token, uid);
-
-        const localMicTrack =
-          await AgoraRTC.createMicrophoneAudioTrack();
-
-        micRef.current = localMicTrack;
-        setMicTrack(localMicTrack);
-        setMicOn(true);
-
-        await client.publish([localMicTrack]);
+        joinedRef.current = true;
       } catch {
         alert("Voice connection error. Please try again.");
       }
@@ -114,15 +116,58 @@ export default function RoomModal({
         micRef.current = null;
       }
 
+      setMicTrack(null);
+      setMicOn(false);
+      joinedRef.current = false;
+
       client.removeAllListeners();
       client.leave().catch(() => {});
     };
   }, [joinedRoom]);
 
+  useEffect(() => {
+    async function updatePublishing() {
+      if (!joinedRef.current) return;
+
+      try {
+        if (canSpeak && !micRef.current) {
+          const localMicTrack =
+            await AgoraRTC.createMicrophoneAudioTrack();
+
+          micRef.current = localMicTrack;
+          setMicTrack(localMicTrack);
+          setMicOn(true);
+
+          await client.publish([localMicTrack]);
+        }
+
+        if (!canSpeak && micRef.current) {
+          await client.unpublish([micRef.current]);
+
+          micRef.current.stop();
+          micRef.current.close();
+          micRef.current = null;
+
+          setMicTrack(null);
+          setMicOn(false);
+        }
+      } catch {
+        alert("Mic permission error. Please try again.");
+      }
+    }
+
+    updatePublishing();
+  }, [canSpeak]);
+
   if (!joinedRoom) return null;
 
   async function toggleMic() {
     const track = micRef.current || micTrack;
+
+    if (!canSpeak) {
+      alert("You need host approval to speak.");
+      return;
+    }
 
     if (!track) {
       alert("Mic is still preparing. Please try again.");
@@ -136,6 +181,7 @@ export default function RoomModal({
   async function closeRoom() {
     try {
       if (micRef.current) {
+        await client.unpublish([micRef.current]);
         micRef.current.stop();
         micRef.current.close();
         micRef.current = null;
@@ -160,6 +206,10 @@ export default function RoomModal({
     if (!item.agoraUid) return false;
 
     return activeSpeakers.includes(String(item.agoraUid));
+  }
+
+  function isRoomSpeaker(item) {
+    return roomSpeakers.some((speaker) => speaker.id === item.id);
   }
 
   return (
@@ -196,7 +246,22 @@ export default function RoomModal({
                       👑 Host
                     </div>
                   )}
+
+                  {isRoomSpeaker(item) && !item.isHost && (
+                    <div className="speakerBadge">
+                      🎤 Speaker
+                    </div>
+                  )}
                 </span>
+
+                {isCurrentUserHost && !item.isHost && isRoomSpeaker(item) && (
+                  <button
+                    className="smallControlBtn"
+                    onClick={() => removeSpeaker(item.id)}
+                  >
+                    Remove Mic
+                  </button>
+                )}
               </div>
             ))
           ) : (
@@ -208,10 +273,16 @@ export default function RoomModal({
         </div>
 
         <div className="raiseHandArea">
-          {!isCurrentUserHost && (
+          {!isCurrentUserHost && !canSpeak && (
             <button className="raiseHandBtn" onClick={raiseHand}>
               ✋ Raise Hand
             </button>
+          )}
+
+          {!isCurrentUserHost && canSpeak && (
+            <p className="speakerApproved">
+              🎤 You are approved to speak
+            </p>
           )}
 
           {isCurrentUserHost && (
@@ -225,9 +296,15 @@ export default function RoomModal({
                   <div className="handRequest" key={item.id}>
                     <span>✋ {item.name}</span>
 
-                    <button onClick={() => clearHand(item.id)}>
-                      Clear
-                    </button>
+                    <div className="handActions">
+                      <button onClick={() => approveSpeaker(item.id)}>
+                        Approve
+                      </button>
+
+                      <button onClick={() => clearHand(item.id)}>
+                        Reject
+                      </button>
+                    </div>
                   </div>
                 ))
               )}
@@ -259,7 +336,11 @@ export default function RoomModal({
             onClick={toggleMic}
             className={micOn ? "micBtn active" : "micBtn muted"}
           >
-            {micOn ? "Mic On" : "Mic Off"}
+            {canSpeak
+              ? micOn
+                ? "Mic On"
+                : "Mic Off"
+              : "Listener"}
           </button>
 
           <button onClick={sendGift}>🌹 Rose -20</button>

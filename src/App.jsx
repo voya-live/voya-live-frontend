@@ -22,6 +22,7 @@ function App() {
   const [liveRooms, setLiveRooms] = useState({});
   const [messages, setMessages] = useState([]);
   const [handRequests, setHandRequests] = useState([]);
+  const [roomSpeakers, setRoomSpeakers] = useState([]);
   const [authMode, setAuthMode] = useState("login");
   const [form, setForm] = useState({
     name: "",
@@ -40,6 +41,10 @@ function App() {
       setHandRequests(data || []);
     });
 
+    socket.on("room:speakersUpdate", (data) => {
+      setRoomSpeakers(data || []);
+    });
+
     loadRooms();
     loadWalletBalance();
 
@@ -47,6 +52,7 @@ function App() {
       socket.off("rooms:update");
       socket.off("room:chat");
       socket.off("room:handRequests");
+      socket.off("room:speakersUpdate");
     };
   }, []);
 
@@ -164,6 +170,7 @@ function App() {
 
     setJoinedRoom(room);
     setHandRequests([]);
+    setRoomSpeakers([]);
 
     socket.emit("room:join", {
       roomId,
@@ -211,6 +218,28 @@ function App() {
     const roomId = String(joinedRoom._id || joinedRoom.id);
 
     socket.emit("room:clearHand", {
+      roomId,
+      userId,
+    });
+  }
+
+  function approveSpeaker(userId) {
+    if (!joinedRoom) return;
+
+    const roomId = String(joinedRoom._id || joinedRoom.id);
+
+    socket.emit("room:approveSpeaker", {
+      roomId,
+      userId,
+    });
+  }
+
+  function removeSpeaker(userId) {
+    if (!joinedRoom) return;
+
+    const roomId = String(joinedRoom._id || joinedRoom.id);
+
+    socket.emit("room:removeSpeaker", {
       roomId,
       userId,
     });
@@ -307,6 +336,9 @@ function App() {
         handRequests={handRequests}
         raiseHand={raiseHand}
         clearHand={clearHand}
+        approveSpeaker={approveSpeaker}
+        removeSpeaker={removeSpeaker}
+        roomSpeakers={roomSpeakers}
         currentUser={user}
       />
     </main>

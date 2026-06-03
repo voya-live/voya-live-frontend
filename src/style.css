@@ -354,4 +354,29 @@ input {
   .roomPanel {
     width: 90%;
   }
+} 
+.speakerBadge {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #22c55e;
+  font-weight: 700;
+}
+
+.speakerApproved {
+  color: #22c55e;
+  font-weight: 700;
+}
+
+.smallControlBtn {
+  margin-top: 10px;
+  background: #ef4444;
+  color: white;
+  padding: 7px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.handActions {
+  display: flex;
+  gap: 8px;
 }
