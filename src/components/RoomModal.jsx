@@ -11,6 +11,12 @@ const client = AgoraRTC.createClient({
   codec: "vp8",
 });
 
+const gifts = [
+  { name: "Rose", icon: "🌹", amount: 20 },
+  { name: "Diamond", icon: "💎", amount: 50 },
+  { name: "Crown", icon: "👑", amount: 100 },
+];
+
 function getNumericUid() {
   const savedUid = localStorage.getItem("agoraUid");
 
@@ -36,6 +42,7 @@ export default function RoomModal({
   removeSpeaker,
   hostMuteUser,
   roomSpeakers,
+  giftFeed,
   currentUser,
 }) {
   const [chatText, setChatText] = useState("");
@@ -320,6 +327,16 @@ export default function RoomModal({
         <p>Hosted by {joinedRoom.host}</p>
         <p>{roomUsers.length} users live now</p>
 
+        {giftFeed.length > 0 && (
+          <div className="giftFeed">
+            {giftFeed.map((gift) => (
+              <div className="giftFeedItem" key={gift.id}>
+                {gift.text}
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className="stageSection">
           <h4>Host</h4>
           <div className="micGrid">
@@ -445,9 +462,14 @@ export default function RoomModal({
               : "Mic Off"}
           </button>
 
-          <button onClick={sendGift}>🌹 Rose -20</button>
-          <button onClick={sendGift}>💎 Diamond -20</button>
-          <button onClick={sendGift}>👑 Crown -20</button>
+          {gifts.map((gift) => (
+            <button
+              key={gift.name}
+              onClick={() => sendGift(gift)}
+            >
+              {gift.icon} {gift.name} -{gift.amount}
+            </button>
+          ))}
         </div>
       </div>
     </div>

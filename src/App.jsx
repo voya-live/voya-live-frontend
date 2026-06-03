@@ -23,6 +23,7 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [handRequests, setHandRequests] = useState([]);
   const [roomSpeakers, setRoomSpeakers] = useState([]);
+  const [giftFeed, setGiftFeed] = useState([]);
   const [authMode, setAuthMode] = useState("login");
   const [form, setForm] = useState({
     name: "",
@@ -49,6 +50,10 @@ function App() {
       alert(data?.message || "Room error");
     });
 
+    socket.on("room:gift", (gift) => {
+      setGiftFeed((prev) => [gift, ...prev].slice(0, 10));
+    });
+
     loadRooms();
     loadWalletBalance();
 
@@ -58,6 +63,7 @@ function App() {
       socket.off("room:handRequests");
       socket.off("room:speakersUpdate");
       socket.off("room:error");
+      socket.off("room:gift");
     };
   }, []);
 
@@ -176,6 +182,7 @@ function App() {
     setJoinedRoom(room);
     setHandRequests([]);
     setRoomSpeakers([]);
+    setGiftFeed([]);
 
     socket.emit("room:join", {
       roomId,
@@ -287,8 +294,18 @@ function App() {
     }
   }
 
-  async function sendGift() {
+  async function sendGift(gift) {
+    if (!joinedRoom || !user) return;
+
     const token = localStorage.getItem("voya_token");
+    const roomId = String(joinedRoom._id || joinedRoom.id);
+
+    const selectedGift =
+      gift || {
+        name: "Rose",
+        icon: "🌹",
+        amount: 20,
+      };
 
     try {
       const response = await fetch(`${backendUrl}/api/wallet/gift`, {
@@ -297,7 +314,9 @@ function App() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ amount: 20 }),
+        body: JSON.stringify({
+          amount: selectedGift.amount,
+        }),
       });
 
       const data = await response.json();
@@ -307,6 +326,14 @@ function App() {
       }
 
       setCoins(data.coins);
+
+      socket.emit("room:gift", {
+        roomId,
+        user: {
+          name: user.name,
+        },
+        gift: selectedGift,
+      });
     } catch {
       alert("Gift backend error");
     }
@@ -357,6 +384,7 @@ function App() {
         removeSpeaker={removeSpeaker}
         hostMuteUser={hostMuteUser}
         roomSpeakers={roomSpeakers}
+        giftFeed={giftFeed}
         currentUser={user}
       />
     </main>
