@@ -29,6 +29,10 @@ export default function RoomModal({
   liveRooms,
   messages,
   sendMessage,
+  handRequests,
+  raiseHand,
+  clearHand,
+  currentUser,
 }) {
   const [chatText, setChatText] = useState("");
   const [micTrack, setMicTrack] = useState(null);
@@ -36,6 +40,15 @@ export default function RoomModal({
   const [activeSpeakers, setActiveSpeakers] = useState([]);
 
   const micRef = useRef(null);
+
+  const roomUsers =
+    liveRooms[String(joinedRoom?._id || joinedRoom?.id)]?.users || [];
+
+  const currentRoomUser = roomUsers.find(
+    (item) => item.id === currentUser?.phone
+  );
+
+  const isCurrentUserHost = currentRoomUser?.isHost || false;
 
   useEffect(() => {
     if (!joinedRoom) return;
@@ -107,9 +120,6 @@ export default function RoomModal({
   }, [joinedRoom]);
 
   if (!joinedRoom) return null;
-
-  const roomUsers =
-    liveRooms[String(joinedRoom._id || joinedRoom.id)]?.users || [];
 
   async function toggleMic() {
     const track = micRef.current || micTrack;
@@ -193,6 +203,34 @@ export default function RoomModal({
             <div className="micSeat">
               <div className="micAvatar">?</div>
               <span>No users yet</span>
+            </div>
+          )}
+        </div>
+
+        <div className="raiseHandArea">
+          {!isCurrentUserHost && (
+            <button className="raiseHandBtn" onClick={raiseHand}>
+              ✋ Raise Hand
+            </button>
+          )}
+
+          {isCurrentUserHost && (
+            <div className="handPanel">
+              <h4>Hand Requests</h4>
+
+              {handRequests.length === 0 ? (
+                <p className="emptyHands">No requests</p>
+              ) : (
+                handRequests.map((item) => (
+                  <div className="handRequest" key={item.id}>
+                    <span>✋ {item.name}</span>
+
+                    <button onClick={() => clearHand(item.id)}>
+                      Clear
+                    </button>
+                  </div>
+                ))
+              )}
             </div>
           )}
         </div>

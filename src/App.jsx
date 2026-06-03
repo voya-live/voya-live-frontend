@@ -21,6 +21,7 @@ function App() {
   const [rooms, setRooms] = useState([]);
   const [liveRooms, setLiveRooms] = useState({});
   const [messages, setMessages] = useState([]);
+  const [handRequests, setHandRequests] = useState([]);
   const [authMode, setAuthMode] = useState("login");
   const [form, setForm] = useState({
     name: "",
@@ -30,9 +31,14 @@ function App() {
 
   useEffect(() => {
     socket.on("rooms:update", (data) => setLiveRooms(data || {}));
+
     socket.on("room:chat", (message) =>
       setMessages((prev) => [...prev, message])
     );
+
+    socket.on("room:handRequests", (data) => {
+      setHandRequests(data || []);
+    });
 
     loadRooms();
     loadWalletBalance();
@@ -40,6 +46,7 @@ function App() {
     return () => {
       socket.off("rooms:update");
       socket.off("room:chat");
+      socket.off("room:handRequests");
     };
   }, []);
 
@@ -156,6 +163,7 @@ function App() {
     const agoraUid = getAgoraUid();
 
     setJoinedRoom(room);
+    setHandRequests([]);
 
     socket.emit("room:join", {
       roomId,
@@ -180,6 +188,31 @@ function App() {
         name: user.name,
       },
       message: text,
+    });
+  }
+
+  function raiseHand() {
+    if (!joinedRoom || !user) return;
+
+    const roomId = String(joinedRoom._id || joinedRoom.id);
+
+    socket.emit("room:raiseHand", {
+      roomId,
+      user: {
+        id: user.phone,
+        name: user.name,
+      },
+    });
+  }
+
+  function clearHand(userId) {
+    if (!joinedRoom) return;
+
+    const roomId = String(joinedRoom._id || joinedRoom.id);
+
+    socket.emit("room:clearHand", {
+      roomId,
+      userId,
     });
   }
 
@@ -271,6 +304,10 @@ function App() {
         liveRooms={liveRooms}
         messages={messages}
         sendMessage={sendMessage}
+        handRequests={handRequests}
+        raiseHand={raiseHand}
+        clearHand={clearHand}
+        currentUser={user}
       />
     </main>
   );
