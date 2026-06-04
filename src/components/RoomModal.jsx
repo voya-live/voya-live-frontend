@@ -52,6 +52,8 @@ export default function RoomModal({
   const [activeSpeakers, setActiveSpeakers] = useState([]);
   const [isAgoraJoined, setIsAgoraJoined] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [profileData, setProfileData] = useState(null);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   const micRef = useRef(null);
   const joinedRef = useRef(false);
@@ -145,6 +147,8 @@ export default function RoomModal({
       setMicOn(false);
       setIsAgoraJoined(false);
       setSelectedUser(null);
+      setProfileData(null);
+      setIsFollowing(false);
       joinedRef.current = false;
 
       client.removeAllListeners();
@@ -197,7 +201,99 @@ export default function RoomModal({
     applyHostMute();
   }, [isHostMuted]);
 
+  useEffect(() => {
+    if (!selectedUser) return;
+
+    loadUserProfile(selectedUser);
+  }, [selectedUser]);
+
   if (!joinedRoom) return null;
+
+  async function loadUserProfile(userItem) {
+    const token = localStorage.getItem("voya_token");
+
+    if (!token || !userItem?.id) return;
+
+    try {
+      const response = await fetch(
+        `${backendUrl}/api/users/profile/${userItem.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setProfileData(data);
+        setIsFollowing(Boolean(data.isFollowing));
+      } else {
+        setProfileData(null);
+      }
+    } catch {
+      setProfileData(null);
+    }
+  }
+
+  async function followSelectedUser() {
+    if (!selectedUser?.id) return;
+
+    const token = localStorage.getItem("voya_token");
+
+    try {
+      const response = await fetch(
+        `${backendUrl}/api/users/follow/${selectedUser.id}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return alert(data.error || "Follow failed");
+      }
+
+      setIsFollowing(true);
+      loadUserProfile(selectedUser);
+    } catch {
+      alert("Follow request failed");
+    }
+  }
+
+  async function unfollowSelectedUser() {
+    if (!selectedUser?.id) return;
+
+    const token = localStorage.getItem("voya_token");
+
+    try {
+      const response = await fetch(
+        `${backendUrl}/api/users/unfollow/${selectedUser.id}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return alert(data.error || "Unfollow failed");
+      }
+
+      setIsFollowing(false);
+      loadUserProfile(selectedUser);
+    } catch {
+      alert("Unfollow request failed");
+    }
+  }
 
   async function toggleMic() {
     const track = micRef.current || micTrack;
@@ -286,6 +382,8 @@ export default function RoomModal({
 
   function openProfile(item) {
     setSelectedUser(item);
+    setProfileData(null);
+    setIsFollowing(false);
   }
 
   function renderUserCard(item) {
@@ -385,6 +483,31 @@ export default function RoomModal({
               <p>Role: {getUserRole(selectedUser)}</p>
               <p>Status: {getUserStatus(selectedUser)}</p>
               <p>User ID: {selectedUser.id}</p>
+
+              <p>
+                Level: {profileData?.level ?? "-"}
+              </p>
+
+              <p>
+                Followers: {profileData?.followers ?? "-"}
+              </p>
+
+              <p>
+                Following: {profileData?.following ?? "-"}
+              </p>
+
+              {selectedUser.id !== currentUser?.phone && (
+                <button
+                  className="profileActionBtn"
+                  onClick={
+                    isFollowing
+                      ? unfollowSelectedUser
+                      : followSelectedUser
+                  }
+                >
+                  {isFollowing ? "Unfollow" : "Follow"}
+                </button>
+              )}
 
               <button
                 className="profileActionBtn"
