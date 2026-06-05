@@ -43,6 +43,7 @@ export default function RoomModal(props) {
     roomSpeakers,
     giftFeed,
     giftAnimation,
+    levelUpData,
     currentUser,
   } = props;
 
@@ -62,9 +63,11 @@ export default function RoomModal(props) {
     liveRooms[String(joinedRoom?._id || joinedRoom?.id)]?.users || [];
 
   const hostUsers = roomUsers.filter((item) => item.isHost);
+
   const speakerUsers = roomUsers.filter(
     (item) => !item.isHost && isRoomSpeaker(item)
   );
+
   const audienceUsers = roomUsers.filter(
     (item) => !item.isHost && !isRoomSpeaker(item)
   );
@@ -456,6 +459,20 @@ export default function RoomModal(props) {
   return (
     <div className="modal">
       <div className="roomPanel">
+        {levelUpData && (
+          <div className="levelUpOverlay">
+            <div className="levelUpCard">
+              <div className="levelUpTitle">LEVEL UP!</div>
+              <div className="levelUpLevel">
+                Level {levelUpData.level}
+              </div>
+              <div className="levelUpText">
+                {levelUpData.text}
+              </div>
+            </div>
+          </div>
+        )}
+
         {giftAnimation && (
           <div className={getGiftAnimationClass(giftAnimation)}>
             <div className="giftBigIcon">

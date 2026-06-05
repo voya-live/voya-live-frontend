@@ -659,3 +659,62 @@ input {
   border-radius: 999px;
   transition: width 0.35s ease;
 }
+.levelUpOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.levelUpCard {
+  background: linear-gradient(135deg, #facc15, #ec4899, #8b5cf6);
+  padding: 28px 34px;
+  border-radius: 24px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 0 40px rgba(236, 72, 153, 0.6);
+  animation: levelUpPop 3s ease forwards;
+}
+
+.levelUpTitle {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.levelUpLevel {
+  margin-top: 8px;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.levelUpText {
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@keyframes levelUpPop {
+  0% {
+    transform: scale(0.4) translateY(40px);
+    opacity: 0;
+  }
+
+  20% {
+    transform: scale(1.12) translateY(0);
+    opacity: 1;
+  }
+
+  75% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0.85) translateY(-30px);
+    opacity: 0;
+  }
+}

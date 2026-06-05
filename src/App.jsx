@@ -25,6 +25,7 @@ function App() {
   const [roomSpeakers, setRoomSpeakers] = useState([]);
   const [giftFeed, setGiftFeed] = useState([]);
   const [giftAnimation, setGiftAnimation] = useState(null);
+  const [levelUpData, setLevelUpData] = useState(null);
   const [authMode, setAuthMode] = useState("login");
   const [form, setForm] = useState({
     name: "",
@@ -96,6 +97,16 @@ function App() {
 
       if (response.ok) {
         setCoins(data.coins || 0);
+
+        if (user) {
+          setUser((prev) => ({
+            ...prev,
+            level: data.level || prev.level || 1,
+            experience: data.experience || 0,
+            totalSpent: data.totalSpent || 0,
+            vipLevel: data.vipLevel || 0,
+          }));
+        }
       }
     } catch {
       console.log("Wallet balance error");
@@ -132,7 +143,7 @@ function App() {
       localStorage.setItem("voya_token", data.token);
       localStorage.setItem("voya_user", JSON.stringify(data.user));
 
-      setUser({ ...data.user, level: 1 });
+      setUser({ ...data.user, level: data.user.level || 1 });
       setCoins(data.user.coins || 0);
 
       loadWalletBalance();
@@ -190,6 +201,7 @@ function App() {
     setRoomSpeakers([]);
     setGiftFeed([]);
     setGiftAnimation(null);
+    setLevelUpData(null);
 
     socket.emit("room:join", {
       roomId,
@@ -315,6 +327,8 @@ function App() {
       };
 
     try {
+      const previousLevel = user.level || 1;
+
       const response = await fetch(`${backendUrl}/api/wallet/gift`, {
         method: "POST",
         headers: {
@@ -333,6 +347,28 @@ function App() {
       }
 
       setCoins(data.coins);
+
+      setUser((prev) => ({
+        ...prev,
+        level: data.level || prev.level || 1,
+        experience: data.experience || 0,
+        totalSpent: data.totalSpent || 0,
+        vipLevel: data.vipLevel || 0,
+      }));
+
+      if (data.level && data.level > previousLevel) {
+        const newLevelUp = {
+          id: Date.now(),
+          level: data.level,
+          text: `LEVEL UP! You reached Level ${data.level}`,
+        };
+
+        setLevelUpData(newLevelUp);
+
+        setTimeout(() => {
+          setLevelUpData(null);
+        }, 3000);
+      }
 
       socket.emit("room:gift", {
         roomId,
@@ -393,6 +429,7 @@ function App() {
         roomSpeakers={roomSpeakers}
         giftFeed={giftFeed}
         giftAnimation={giftAnimation}
+        levelUpData={levelUpData}
         currentUser={user}
       />
     </main>
