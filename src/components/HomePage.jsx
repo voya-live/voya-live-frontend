@@ -13,8 +13,14 @@ export default function HomePage({
   const [topGifters, setTopGifters] = useState([]);
 
   useEffect(() => {
+  loadLeaderboard();
+
+  const interval = setInterval(() => {
     loadLeaderboard();
-  }, []);
+  }, 2000);
+
+  return () => clearInterval(interval);
+}, []);
 
   async function loadLeaderboard() {
     try {
