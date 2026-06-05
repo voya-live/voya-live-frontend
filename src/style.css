@@ -594,3 +594,37 @@ input {
 .leaderboardItem:last-child {
   border-bottom: none;
 }
+.vipBadge {
+  width: fit-content;
+  margin: 8px auto 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #111;
+  background: linear-gradient(135deg, #facc15, #fb923c);
+  box-shadow: 0 0 18px rgba(250, 204, 21, 0.35);
+}
+
+.vip1 {
+  background: linear-gradient(135deg, #fde68a, #facc15);
+}
+
+.vip2 {
+  background: linear-gradient(135deg, #facc15, #fb923c);
+}
+
+.vip3 {
+  background: linear-gradient(135deg, #fb923c, #f97316);
+}
+
+.vip4 {
+  background: linear-gradient(135deg, #c084fc, #ec4899);
+  color: #fff;
+}
+
+.vip5 {
+  background: linear-gradient(135deg, #facc15, #ec4899, #8b5cf6);
+  color: #fff;
+  box-shadow: 0 0 24px rgba(236, 72, 153, 0.55);
+}

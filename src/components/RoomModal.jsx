@@ -19,12 +19,10 @@ const gifts = [
 
 function getNumericUid() {
   const savedUid = localStorage.getItem("agoraUid");
-
   if (savedUid) return Number(savedUid);
 
   const newUid = Math.floor(Math.random() * 1000000);
   localStorage.setItem("agoraUid", String(newUid));
-
   return newUid;
 }
 
@@ -62,11 +60,9 @@ export default function RoomModal({
     liveRooms[String(joinedRoom?._id || joinedRoom?.id)]?.users || [];
 
   const hostUsers = roomUsers.filter((item) => item.isHost);
-
   const speakerUsers = roomUsers.filter(
     (item) => !item.isHost && isRoomSpeaker(item)
   );
-
   const audienceUsers = roomUsers.filter(
     (item) => !item.isHost && !isRoomSpeaker(item)
   );
@@ -82,7 +78,6 @@ export default function RoomModal({
   );
 
   const isHostMuted = currentSpeaker?.muted || false;
-
   const canSpeak = isCurrentUserHost || Boolean(currentSpeaker);
 
   useEffect(() => {
@@ -203,7 +198,6 @@ export default function RoomModal({
 
   useEffect(() => {
     if (!selectedUser) return;
-
     loadUserProfile(selectedUser);
   }, [selectedUser]);
 
@@ -211,7 +205,6 @@ export default function RoomModal({
 
   async function loadUserProfile(userItem) {
     const token = localStorage.getItem("voya_token");
-
     if (!token || !userItem?.id) return;
 
     try {
@@ -343,7 +336,6 @@ export default function RoomModal({
 
   function isUserSpeaking(item) {
     if (!item.agoraUid) return false;
-
     return activeSpeakers.includes(String(item.agoraUid));
   }
 
@@ -384,6 +376,16 @@ export default function RoomModal({
     setSelectedUser(item);
     setProfileData(null);
     setIsFollowing(false);
+  }
+
+  function renderVipBadge(vipLevel) {
+    if (!vipLevel || vipLevel <= 0) return null;
+
+    return (
+      <div className={`vipBadge vip${vipLevel}`}>
+        VIP {vipLevel}
+      </div>
+    );
   }
 
   function renderUserCard(item) {
@@ -480,12 +482,16 @@ export default function RoomModal({
 
               <h3>{selectedUser.name}</h3>
 
+              {renderVipBadge(profileData?.vipLevel)}
+
               <p>Role: {getUserRole(selectedUser)}</p>
               <p>Status: {getUserStatus(selectedUser)}</p>
               <p>User ID: {selectedUser.id}</p>
 
               <p>Level: {profileData?.level ?? "-"}</p>
+              <p>VIP: {profileData?.vipLevel ?? 0}</p>
               <p>EXP: {profileData?.experience ?? "-"}</p>
+              <p>Total Spent: {profileData?.totalSpent ?? 0}</p>
               <p>Followers: {profileData?.followers ?? "-"}</p>
               <p>Following: {profileData?.following ?? "-"}</p>
 
