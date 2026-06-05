@@ -393,6 +393,24 @@ export default function RoomModal(props) {
     );
   }
 
+  function renderMiniVip(vipLevel) {
+    if (!vipLevel || vipLevel <= 0) return null;
+
+    return (
+      <span className={`miniVipBadge vip${vipLevel}`}>
+        VIP {vipLevel}
+      </span>
+    );
+  }
+
+  function renderLevelBadge(level) {
+    return (
+      <span className="levelBadge">
+        Lv.{level || 1}
+      </span>
+    );
+  }
+
   function getExpProgress() {
     const exp = profileData?.experience || 0;
     return exp % 100;
@@ -416,21 +434,26 @@ export default function RoomModal(props) {
           {item.name?.[0] || "U"}
         </div>
 
-        <span>
+        <div className="seatName">
           {item.name}
+        </div>
 
-          {item.isHost && (
-            <div className="hostBadge">👑 Host</div>
-          )}
+        <div className="seatBadges">
+          {renderLevelBadge(item.level)}
+          {renderMiniVip(item.vipLevel)}
+        </div>
 
-          {isRoomSpeaker(item) && !item.isHost && (
-            <div className="speakerBadge">🎤 Speaker</div>
-          )}
+        {item.isHost && (
+          <div className="hostBadge">👑 Host</div>
+        )}
 
-          {muted && (
-            <div className="mutedBadge">🔇 Muted</div>
-          )}
-        </span>
+        {isRoomSpeaker(item) && !item.isHost && (
+          <div className="speakerBadge">🎤 Speaker</div>
+        )}
+
+        {muted && (
+          <div className="mutedBadge">🔇 Muted</div>
+        )}
 
         {isCurrentUserHost && !item.isHost && isRoomSpeaker(item) && (
           <div
@@ -610,7 +633,13 @@ export default function RoomModal(props) {
                   <div className="audienceAvatar">
                     {item.name?.[0] || "U"}
                   </div>
+
                   <span>{item.name}</span>
+
+                  <div className="audienceBadges">
+                    {renderLevelBadge(item.level)}
+                    {renderMiniVip(item.vipLevel)}
+                  </div>
                 </div>
               ))
             ) : (

@@ -718,3 +718,45 @@ input {
     opacity: 0;
   }
 }
+.seatName {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.seatBadges {
+  margin-top: 7px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.levelBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: #29345f;
+  color: #cbd5e1;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.miniVipBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
+  color: #111;
+}
+
+.audienceBadges {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+}
