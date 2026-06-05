@@ -26,24 +26,26 @@ function getNumericUid() {
   return newUid;
 }
 
-export default function RoomModal({
-  joinedRoom,
-  setJoinedRoom,
-  sendGift,
-  liveRooms,
-  messages,
-  sendMessage,
-  handRequests,
-  raiseHand,
-  clearHand,
-  approveSpeaker,
-  removeSpeaker,
-  hostMuteUser,
-  roomSpeakers,
-  giftFeed,
-  giftAnimation,
-  currentUser,
-}) {
+export default function RoomModal(props) {
+  const {
+    joinedRoom,
+    setJoinedRoom,
+    sendGift,
+    liveRooms,
+    messages,
+    sendMessage,
+    handRequests,
+    raiseHand,
+    clearHand,
+    approveSpeaker,
+    removeSpeaker,
+    hostMuteUser,
+    roomSpeakers,
+    giftFeed,
+    giftAnimation,
+    currentUser,
+  } = props;
+
   const [chatText, setChatText] = useState("");
   const [micTrack, setMicTrack] = useState(null);
   const [micOn, setMicOn] = useState(false);
@@ -388,6 +390,11 @@ export default function RoomModal({
     );
   }
 
+  function getExpProgress() {
+    const exp = profileData?.experience || 0;
+    return exp % 100;
+  }
+
   function renderUserCard(item) {
     const speaker = getSpeaker(item);
     const muted = speaker?.muted || false;
@@ -410,21 +417,15 @@ export default function RoomModal({
           {item.name}
 
           {item.isHost && (
-            <div className="hostBadge">
-              👑 Host
-            </div>
+            <div className="hostBadge">👑 Host</div>
           )}
 
           {isRoomSpeaker(item) && !item.isHost && (
-            <div className="speakerBadge">
-              🎤 Speaker
-            </div>
+            <div className="speakerBadge">🎤 Speaker</div>
           )}
 
           {muted && (
-            <div className="mutedBadge">
-              🔇 Muted
-            </div>
+            <div className="mutedBadge">🔇 Muted</div>
           )}
         </span>
 
@@ -486,11 +487,26 @@ export default function RoomModal({
 
               <p>Role: {getUserRole(selectedUser)}</p>
               <p>Status: {getUserStatus(selectedUser)}</p>
-              <p>User ID: {selectedUser.id}</p>
 
               <p>Level: {profileData?.level ?? "-"}</p>
+
+              <div className="expBox">
+                <div className="expInfo">
+                  <span>EXP</span>
+                  <span>{getExpProgress()}/100</span>
+                </div>
+
+                <div className="expBar">
+                  <div
+                    className="expFill"
+                    style={{
+                      width: `${getExpProgress()}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
               <p>VIP: {profileData?.vipLevel ?? 0}</p>
-              <p>EXP: {profileData?.experience ?? "-"}</p>
               <p>Total Spent: {profileData?.totalSpent ?? 0}</p>
               <p>Followers: {profileData?.followers ?? "-"}</p>
               <p>Following: {profileData?.following ?? "-"}</p>
