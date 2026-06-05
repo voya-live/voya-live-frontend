@@ -140,10 +140,18 @@ function App() {
         return alert(data.error || "Authentication failed");
       }
 
-      localStorage.setItem("voya_token", data.token);
-      localStorage.setItem("voya_user", JSON.stringify(data.user));
+      const normalizedUser = {
+        ...data.user,
+        level: data.user.level || 1,
+        experience: data.user.experience || 0,
+        totalSpent: data.user.totalSpent || 0,
+        vipLevel: data.user.vipLevel || 0,
+      };
 
-      setUser({ ...data.user, level: data.user.level || 1 });
+      localStorage.setItem("voya_token", data.token);
+      localStorage.setItem("voya_user", JSON.stringify(normalizedUser));
+
+      setUser(normalizedUser);
       setCoins(data.user.coins || 0);
 
       loadWalletBalance();
@@ -211,6 +219,9 @@ function App() {
         id: user.phone,
         name: user.name,
         isHost: room.host === user.name,
+        level: user.level || 1,
+        experience: user.experience || 0,
+        vipLevel: user.vipLevel || 0,
       },
     });
   }
@@ -348,13 +359,16 @@ function App() {
 
       setCoins(data.coins);
 
-      setUser((prev) => ({
-        ...prev,
-        level: data.level || prev.level || 1,
+      const updatedUser = {
+        ...user,
+        level: data.level || user.level || 1,
         experience: data.experience || 0,
         totalSpent: data.totalSpent || 0,
         vipLevel: data.vipLevel || 0,
-      }));
+      };
+
+      setUser(updatedUser);
+      localStorage.setItem("voya_user", JSON.stringify(updatedUser));
 
       if (data.level && data.level > previousLevel) {
         const newLevelUp = {
@@ -376,6 +390,20 @@ function App() {
           name: user.name,
         },
         gift: selectedGift,
+      });
+
+      socket.emit("room:join", {
+        roomId,
+        agoraUid: getAgoraUid(),
+
+        user: {
+          id: updatedUser.phone,
+          name: updatedUser.name,
+          isHost: joinedRoom.host === updatedUser.name,
+          level: updatedUser.level || 1,
+          experience: updatedUser.experience || 0,
+          vipLevel: updatedUser.vipLevel || 0,
+        },
       });
     } catch {
       alert("Gift backend error");
