@@ -574,3 +574,23 @@ input {
   border-radius: 12px;
   font-weight: 700;
 }
+.leaderboardBox {
+  background: #1d2750;
+  border-radius: 16px;
+  padding: 15px;
+  margin-bottom: 25px;
+}
+
+.leaderboardItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #29345f;
+  font-size: 14px;
+}
+
+.leaderboardItem:last-child {
+  border-bottom: none;
+}

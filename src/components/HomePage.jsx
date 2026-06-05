@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import WalletBox from "./WalletBox";
 
 export default function HomePage({
@@ -10,6 +10,25 @@ export default function HomePage({
   createRoom,
 }) {
   const [roomName, setRoomName] = useState("");
+  const [topGifters, setTopGifters] = useState([]);
+
+  useEffect(() => {
+    loadLeaderboard();
+  }, []);
+
+  async function loadLeaderboard() {
+    try {
+      const response = await fetch(
+        "https://voya-live-backend.onrender.com/api/leaderboard/gifters"
+      );
+
+      const data = await response.json();
+
+      setTopGifters(data || []);
+    } catch {
+      console.log("Leaderboard load failed");
+    }
+  }
 
   function handleCreateRoom() {
     if (!roomName.trim()) {
@@ -37,17 +56,48 @@ export default function HomePage({
             value={roomName}
             onChange={(e) => setRoomName(e.target.value)}
           />
-          <button onClick={handleCreateRoom}>Start Room</button>
+
+          <button onClick={handleCreateRoom}>
+            Start Room
+          </button>
         </div>
       </div>
 
       <WalletBox coins={coins} recharge={recharge} />
 
+      <h2 className="sectionTitle">🏆 Top Gifters</h2>
+
+      <div className="leaderboardBox">
+        {topGifters.length > 0 ? (
+          topGifters.slice(0, 10).map((user, index) => (
+            <div
+              className="leaderboardItem"
+              key={user._id || index}
+            >
+              <span>
+                #{index + 1} {user.name}
+              </span>
+
+              <span>
+                Lv.{user.level || 1}
+              </span>
+
+              <span>
+                💰 {user.totalSpent || 0}
+              </span>
+            </div>
+          ))
+        ) : (
+          <p className="emptyHands">No leaderboard data yet</p>
+        )}
+      </div>
+
       <h2 className="sectionTitle">Live Rooms</h2>
 
       <div className="roomGrid">
         {rooms.map((room) => {
-          const liveCount = liveRooms[String(room.id)]?.users?.length || 0;
+          const liveCount =
+            liveRooms[String(room.id)]?.users?.length || 0;
 
           return (
             <div className="roomCard" key={room.id}>
@@ -58,7 +108,9 @@ export default function HomePage({
 
               <div className="roomFooter">
                 <span>{liveCount} live now</span>
-                <button onClick={() => setJoinedRoom(room)}>Join</button>
+                <button onClick={() => setJoinedRoom(room)}>
+                  Join
+                </button>
               </div>
             </div>
           );
