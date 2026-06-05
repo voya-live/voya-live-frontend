@@ -484,17 +484,10 @@ export default function RoomModal({
               <p>Status: {getUserStatus(selectedUser)}</p>
               <p>User ID: {selectedUser.id}</p>
 
-              <p>
-                Level: {profileData?.level ?? "-"}
-              </p>
-
-              <p>
-                Followers: {profileData?.followers ?? "-"}
-              </p>
-
-              <p>
-                Following: {profileData?.following ?? "-"}
-              </p>
+              <p>Level: {profileData?.level ?? "-"}</p>
+              <p>EXP: {profileData?.experience ?? "-"}</p>
+              <p>Followers: {profileData?.followers ?? "-"}</p>
+              <p>Following: {profileData?.following ?? "-"}</p>
 
               {selectedUser.id !== currentUser?.phone && (
                 <button
