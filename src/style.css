@@ -903,3 +903,47 @@ input {
     flex-direction: column;
   }
 }
+.miniRoomPlayer {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+
+  background: #111735;
+  border: 1px solid #29345f;
+
+  border-radius: 18px;
+  padding: 14px 18px;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  z-index: 9999;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,.4);
+}
+
+.miniRoomPlayer strong {
+  display: block;
+  color: white;
+  font-size: 14px;
+}
+
+.miniRoomPlayer span {
+  display: block;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.miniRoomPlayer button {
+  background: #c084fc;
+  color: #111;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-weight: 700;
+}
+
+.miniLeaveBtn {
+  background: #ef4444 !important;
+  color: white !important;
+}

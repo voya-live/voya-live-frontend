@@ -45,6 +45,8 @@ export default function RoomPage(props) {
     giftAnimation,
     levelUpData,
     currentUser,
+    isRoomMinimized,
+setIsRoomMinimized,
   } = props;
 
   const [chatText, setChatText] = useState("");
@@ -207,6 +209,7 @@ export default function RoomPage(props) {
   }, [selectedUser]);
 
   if (!joinedRoom) return null;
+  if (isRoomMinimized) return null;
 
   async function loadUserProfile(userItem) {
     const token = localStorage.getItem("voya_token");
@@ -320,8 +323,8 @@ export default function RoomPage(props) {
   }
 
   function minimizeRoom() {
-    alert("Minimize will be added in the next step.");
-  }
+  setIsRoomMinimized(true);
+}
 
   async function closeRoom() {
     try {

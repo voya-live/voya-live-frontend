@@ -18,6 +18,7 @@ function App() {
   );
   const [coins, setCoins] = useState(0);
   const [joinedRoom, setJoinedRoom] = useState(null);
+  const [isRoomMinimized, setIsRoomMinimized] = useState(false);
   const [rooms, setRooms] = useState([]);
   const [liveRooms, setLiveRooms] = useState({});
   const [messages, setMessages] = useState([]);
@@ -205,6 +206,7 @@ function App() {
     const agoraUid = getAgoraUid();
 
     setJoinedRoom(room);
+    setIsRoomMinimized(false);
     setMessages([]);
     setHandRequests([]);
     setRoomSpeakers([]);
@@ -411,6 +413,17 @@ function App() {
     }
   }
 
+  function leaveRoom() {
+    setJoinedRoom(null);
+    setIsRoomMinimized(false);
+    setMessages([]);
+    setHandRequests([]);
+    setRoomSpeakers([]);
+    setGiftFeed([]);
+    setGiftAnimation(null);
+    setLevelUpData(null);
+  }
+
   function logout() {
     localStorage.removeItem("voya_token");
     localStorage.removeItem("voya_user");
@@ -430,43 +443,66 @@ function App() {
   }
 
   return (
-  <main className={joinedRoom ? "app roomMode" : "app"}>
-    {!joinedRoom && (
-      <Sidebar user={user} coins={coins} setUser={logout} />
-    )}
+    <main className={joinedRoom && !isRoomMinimized ? "app roomMode" : "app"}>
+      {(!joinedRoom || isRoomMinimized) && (
+        <>
+          <Sidebar user={user} coins={coins} setUser={logout} />
 
-    {!joinedRoom ? (
-      <HomePage
-        rooms={rooms}
-        liveRooms={liveRooms}
-        coins={coins}
-        recharge={recharge}
-        setJoinedRoom={joinRoom}
-        createRoom={createRoom}
-      />
-    ) : (
-      <RoomPage
-        joinedRoom={joinedRoom}
-        setJoinedRoom={() => setJoinedRoom(null)}
-        sendGift={sendGift}
-        liveRooms={liveRooms}
-        messages={messages}
-        sendMessage={sendMessage}
-        handRequests={handRequests}
-        raiseHand={raiseHand}
-        clearHand={clearHand}
-        approveSpeaker={approveSpeaker}
-        removeSpeaker={removeSpeaker}
-        hostMuteUser={hostMuteUser}
-        roomSpeakers={roomSpeakers}
-        giftFeed={giftFeed}
-        giftAnimation={giftAnimation}
-        levelUpData={levelUpData}
-        currentUser={user}
-      />
-    )}
-  </main>
-);
+          <HomePage
+            rooms={rooms}
+            liveRooms={liveRooms}
+            coins={coins}
+            recharge={recharge}
+            setJoinedRoom={joinRoom}
+            createRoom={createRoom}
+          />
+        </>
+      )}
+
+      {joinedRoom && !isRoomMinimized && (
+        <RoomPage
+          joinedRoom={joinedRoom}
+          setJoinedRoom={setJoinedRoom}
+          sendGift={sendGift}
+          liveRooms={liveRooms}
+          messages={messages}
+          sendMessage={sendMessage}
+          handRequests={handRequests}
+          raiseHand={raiseHand}
+          clearHand={clearHand}
+          approveSpeaker={approveSpeaker}
+          removeSpeaker={removeSpeaker}
+          hostMuteUser={hostMuteUser}
+          roomSpeakers={roomSpeakers}
+          giftFeed={giftFeed}
+          giftAnimation={giftAnimation}
+          levelUpData={levelUpData}
+          currentUser={user}
+          isRoomMinimized={isRoomMinimized}
+          setIsRoomMinimized={setIsRoomMinimized}
+        />
+      )}
+
+      {joinedRoom && isRoomMinimized && (
+        <div className="miniRoomPlayer">
+          <div>
+            <strong>{joinedRoom.name}</strong>
+            <span>
+              {liveRooms[String(joinedRoom._id || joinedRoom.id)]?.users?.length || 0} live
+            </span>
+          </div>
+
+          <button onClick={() => setIsRoomMinimized(false)}>
+            Return
+          </button>
+
+          <button className="miniLeaveBtn" onClick={leaveRoom}>
+            Leave
+          </button>
+        </div>
+      )}
+    </main>
+  );
 }
 
 createRoot(document.getElementById("root")).render(<App />);
