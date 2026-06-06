@@ -7,7 +7,7 @@ import "./style.css";
 import AuthPage from "./components/AuthPage";
 import Sidebar from "./components/Sidebar";
 import HomePage from "./components/HomePage";
-import RoomModal from "./components/RoomModal";
+import RoomPage from "./components/RoomPage";
 
 const backendUrl = "https://voya-live-backend.onrender.com";
 const socket = io(backendUrl);
@@ -205,6 +205,7 @@ function App() {
     const agoraUid = getAgoraUid();
 
     setJoinedRoom(room);
+    setMessages([]);
     setHandRequests([]);
     setRoomSpeakers([]);
     setGiftFeed([]);
@@ -429,9 +430,12 @@ function App() {
   }
 
   return (
-    <main className="app">
+  <main className={joinedRoom ? "app roomMode" : "app"}>
+    {!joinedRoom && (
       <Sidebar user={user} coins={coins} setUser={logout} />
+    )}
 
+    {!joinedRoom ? (
       <HomePage
         rooms={rooms}
         liveRooms={liveRooms}
@@ -440,8 +444,8 @@ function App() {
         setJoinedRoom={joinRoom}
         createRoom={createRoom}
       />
-
-      <RoomModal
+    ) : (
+      <RoomPage
         joinedRoom={joinedRoom}
         setJoinedRoom={() => setJoinedRoom(null)}
         sendGift={sendGift}
@@ -460,8 +464,9 @@ function App() {
         levelUpData={levelUpData}
         currentUser={user}
       />
-    </main>
-  );
+    )}
+  </main>
+);
 }
 
 createRoot(document.getElementById("root")).render(<App />);
