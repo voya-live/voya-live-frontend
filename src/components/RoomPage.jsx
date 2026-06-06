@@ -46,8 +46,8 @@ export default function RoomPage(props) {
     levelUpData,
     currentUser,
     isRoomMinimized,
-setIsRoomMinimized,
-leaveRoom,
+    setIsRoomMinimized,
+    leaveRoom,
   } = props;
 
   const [chatText, setChatText] = useState("");
@@ -324,24 +324,7 @@ leaveRoom,
   }
 
   function minimizeRoom() {
-  setIsRoomMinimized(true);
-}
-
-  async function closeRoom() {
-    try {
-      if (micRef.current) {
-        await client.unpublish([micRef.current]);
-        micRef.current.stop();
-        micRef.current.close();
-        micRef.current = null;
-      }
-
-      await client.leave();
-    } catch {
-      // ignore
-    }
-
-    setJoinedRoom(null);
+    setIsRoomMinimized(true);
   }
 
   function handleSend() {
@@ -446,26 +429,20 @@ leaveRoom,
           {item.name?.[0] || "U"}
         </div>
 
-        <div className="seatName">
-          {item.name}
-        </div>
+        <div className="seatName">{item.name}</div>
 
         <div className="seatBadges">
           {renderLevelBadge(item.level)}
           {renderMiniVip(item.vipLevel)}
         </div>
 
-        {item.isHost && (
-          <div className="hostBadge">👑 Host</div>
-        )}
+        {item.isHost && <div className="hostBadge">👑 Host</div>}
 
         {isRoomSpeaker(item) && !item.isHost && (
           <div className="speakerBadge">🎤 Speaker</div>
         )}
 
-        {muted && (
-          <div className="mutedBadge">🔇 Muted</div>
-        )}
+        {muted && <div className="mutedBadge">🔇 Muted</div>}
 
         {isCurrentUserHost && !item.isHost && isRoomSpeaker(item) && (
           <div
@@ -487,6 +464,43 @@ leaveRoom,
             </button>
           </div>
         )}
+      </div>
+    );
+  }
+
+  function renderHostCard() {
+    const host = hostUsers[0];
+
+    if (!host) {
+      return (
+        <div className="hostHeroCard">
+          <div className="hostHeroAvatar">?</div>
+          <h3>No host online</h3>
+        </div>
+      );
+    }
+
+    return (
+      <div
+        className={
+          isUserSpeaking(host)
+            ? "hostHeroCard activeSpeaker"
+            : "hostHeroCard"
+        }
+        onClick={() => openProfile(host)}
+      >
+        <div className="hostHeroAvatar">
+          {host.name?.[0] || "H"}
+        </div>
+
+        <h3>{host.name}</h3>
+
+        <div className="seatBadges">
+          {renderLevelBadge(host.level)}
+          {renderMiniVip(host.vipLevel)}
+        </div>
+
+        <div className="hostBadge">👑 Host</div>
       </div>
     );
   }
@@ -593,17 +607,11 @@ leaveRoom,
           </div>
 
           <div className="roomHeaderActions">
-            <button onClick={backToHome}>
-              ← Back
-            </button>
-
-            <button onClick={minimizeRoom}>
-              — Minimize
-            </button>
-
+            <button onClick={backToHome}>← Back</button>
+            <button onClick={minimizeRoom}>— Minimize</button>
             <button className="leaveBtn" onClick={leaveRoom}>
-  × Leave
-</button>
+              × Leave
+            </button>
           </div>
         </div>
 
@@ -619,29 +627,18 @@ leaveRoom,
 
         <div className="roomLayout">
           <div className="roomMain">
-            <div className="stageSection">
-              <h4>Host</h4>
-              <div className="micGrid">
-                {hostUsers.length > 0 ? (
-                  hostUsers.map((item) => renderUserCard(item))
-                ) : (
-                  <div className="micSeat">
-                    <div className="micAvatar">?</div>
-                    <span>No host online</span>
-                  </div>
-                )}
-              </div>
+            <div className="hostHeroSection">
+              {renderHostCard()}
             </div>
 
             <div className="stageSection">
               <h4>Speakers ({speakerUsers.length}/8)</h4>
-              <div className="micGrid">
+              <div className="speakerCircleGrid">
                 {speakerUsers.length > 0 ? (
                   speakerUsers.map((item) => renderUserCard(item))
                 ) : (
-                  <div className="micSeat">
-                    <div className="micAvatar">🎤</div>
-                    <span>No speakers yet</span>
+                  <div className="emptyStageBox">
+                    No speakers yet
                   </div>
                 )}
               </div>
