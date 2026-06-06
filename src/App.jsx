@@ -414,15 +414,27 @@ function App() {
   }
 
   function leaveRoom() {
-    setJoinedRoom(null);
-    setIsRoomMinimized(false);
-    setMessages([]);
-    setHandRequests([]);
-    setRoomSpeakers([]);
-    setGiftFeed([]);
-    setGiftAnimation(null);
-    setLevelUpData(null);
+  if (joinedRoom && user) {
+    const roomId = String(joinedRoom._id || joinedRoom.id);
+
+    socket.emit("room:leave", {
+      roomId,
+      user: {
+        id: user.phone,
+        name: user.name,
+      },
+    });
   }
+
+  setJoinedRoom(null);
+  setIsRoomMinimized(false);
+  setMessages([]);
+  setHandRequests([]);
+  setRoomSpeakers([]);
+  setGiftFeed([]);
+  setGiftAnimation(null);
+  setLevelUpData(null);
+}
 
   function logout() {
     localStorage.removeItem("voya_token");
@@ -480,6 +492,7 @@ function App() {
           currentUser={user}
           isRoomMinimized={isRoomMinimized}
           setIsRoomMinimized={setIsRoomMinimized}
+          leaveRoom={leaveRoom}
         />
       )}
 

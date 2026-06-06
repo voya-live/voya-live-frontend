@@ -47,6 +47,7 @@ export default function RoomPage(props) {
     currentUser,
     isRoomMinimized,
 setIsRoomMinimized,
+leaveRoom,
   } = props;
 
   const [chatText, setChatText] = useState("");
@@ -600,9 +601,9 @@ setIsRoomMinimized,
               — Minimize
             </button>
 
-            <button className="leaveBtn" onClick={closeRoom}>
-              × Leave
-            </button>
+            <button className="leaveBtn" onClick={leaveRoom}>
+  × Leave
+</button>
           </div>
         </div>
 
