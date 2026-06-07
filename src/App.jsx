@@ -56,33 +56,35 @@ function App() {
 
     socket.on("room:gift", (gift) => {
       setGiftFeed((prev) => [gift, ...prev].slice(0, 3));
+
       setRoomSupporters((prev) => {
-  const existing = prev.find((item) => item.name === gift.user);
+        const existing = prev.find((item) => item.name === gift.user);
 
-  if (existing) {
-    return prev
-      .map((item) =>
-        item.name === gift.user
-          ? {
-              ...item,
-              total: item.total + Number(gift.amount || 0),
-            }
-          : item
-      )
-      .sort((a, b) => b.total - a.total)
-      .slice(0, 3);
-  }
+        if (existing) {
+          return prev
+            .map((item) =>
+              item.name === gift.user
+                ? {
+                    ...item,
+                    total: item.total + Number(gift.amount || 0),
+                  }
+                : item
+            )
+            .sort((a, b) => b.total - a.total)
+            .slice(0, 3);
+        }
 
-  return [
-    ...prev,
-    {
-      name: gift.user,
-      total: Number(gift.amount || 0),
-    },
-  ]
-    .sort((a, b) => b.total - a.total)
-    .slice(0, 3);
-});
+        return [
+          ...prev,
+          {
+            name: gift.user,
+            total: Number(gift.amount || 0),
+          },
+        ]
+          .sort((a, b) => b.total - a.total)
+          .slice(0, 3);
+      });
+
       setGiftAnimation(gift);
 
       setTimeout(() => {
@@ -246,7 +248,6 @@ function App() {
     socket.emit("room:join", {
       roomId,
       agoraUid,
-
       user: {
         id: user.phone,
         name: user.name,
@@ -280,6 +281,17 @@ function App() {
     socket.emit("room:hostMuteUser", {
       roomId,
       userId,
+      muted,
+    });
+  }
+
+  function hostMuteAll(muted) {
+    if (!joinedRoom) return;
+
+    const roomId = String(joinedRoom._id || joinedRoom.id);
+
+    socket.emit("room:hostMuteAll", {
+      roomId,
       muted,
     });
   }
@@ -416,39 +428,6 @@ function App() {
         }, 3000);
       }
 
-setRoomSupporters((prev) => {
-  const existing = prev.find(
-    (x) => x.name === user.name
-  );
-
-  let updated;
-
-  if (existing) {
-    updated = prev.map((x) =>
-      x.name === user.name
-        ? {
-            ...x,
-            total:
-              x.total +
-              selectedGift.amount,
-          }
-        : x
-    );
-  } else {
-    updated = [
-      ...prev,
-      {
-        name: user.name,
-        total: selectedGift.amount,
-      },
-    ];
-  }
-
-  return updated.sort(
-    (a, b) => b.total - a.total
-  );
-});
-
       socket.emit("room:gift", {
         roomId,
         user: {
@@ -460,7 +439,6 @@ setRoomSupporters((prev) => {
       socket.emit("room:join", {
         roomId,
         agoraUid: getAgoraUid(),
-
         user: {
           id: updatedUser.phone,
           name: updatedUser.name,
@@ -476,28 +454,28 @@ setRoomSupporters((prev) => {
   }
 
   function leaveRoom() {
-  if (joinedRoom && user) {
-    const roomId = String(joinedRoom._id || joinedRoom.id);
+    if (joinedRoom && user) {
+      const roomId = String(joinedRoom._id || joinedRoom.id);
 
-    socket.emit("room:leave", {
-      roomId,
-      user: {
-        id: user.phone,
-        name: user.name,
-      },
-    });
+      socket.emit("room:leave", {
+        roomId,
+        user: {
+          id: user.phone,
+          name: user.name,
+        },
+      });
+    }
+
+    setJoinedRoom(null);
+    setIsRoomMinimized(false);
+    setMessages([]);
+    setHandRequests([]);
+    setRoomSpeakers([]);
+    setGiftFeed([]);
+    setRoomSupporters([]);
+    setGiftAnimation(null);
+    setLevelUpData(null);
   }
-
-  setJoinedRoom(null);
-  setIsRoomMinimized(false);
-  setMessages([]);
-  setHandRequests([]);
-  setRoomSpeakers([]);
-  setGiftFeed([]);
-  setRoomSupporters([]);
-  setGiftAnimation(null);
-  setLevelUpData(null);
-}
 
   function logout() {
     localStorage.removeItem("voya_token");
@@ -548,6 +526,7 @@ setRoomSupporters((prev) => {
           approveSpeaker={approveSpeaker}
           removeSpeaker={removeSpeaker}
           hostMuteUser={hostMuteUser}
+          hostMuteAll={hostMuteAll}
           roomSpeakers={roomSpeakers}
           giftFeed={giftFeed}
           roomSupporters={roomSupporters}

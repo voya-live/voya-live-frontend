@@ -1073,4 +1073,21 @@ input {
     opacity: 1;
     transform: translateX(0);
   }
-}ٍ
+}ٍٍ
+.hostRoomControls {
+  display: flex;
+  gap: 10px;
+  margin: 12px 0 16px;
+}
+
+.hostRoomControls button {
+  background: #ef4444;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.hostRoomControls button:last-child {
+  background: #22c55e;
+}

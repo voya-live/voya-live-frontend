@@ -40,6 +40,7 @@ export default function RoomPage(props) {
     approveSpeaker,
     removeSpeaker,
     hostMuteUser,
+    hostMuteAll,
     roomSpeakers,
     giftFeed,
     giftAnimation,
@@ -617,15 +618,15 @@ export default function RoomPage(props) {
         </div>
 
         {giftFeed.length > 0 && (
-  <div className="giftFeed">
-    {giftFeed.map((gift) => (
-      <div className="giftFeedItem" key={gift.id}>
-        <span className="giftFeedIcon">{gift.giftIcon}</span>
-        <span>{gift.text}</span>
-      </div>
-    ))}
-  </div>
-)}
+          <div className="giftFeed">
+            {giftFeed.map((gift) => (
+              <div className="giftFeedItem" key={gift.id}>
+                <span className="giftFeedIcon">{gift.giftIcon}</span>
+                <span>{gift.text}</span>
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="roomLayout">
           <div className="roomMain">
@@ -635,6 +636,19 @@ export default function RoomPage(props) {
 
             <div className="stageSection">
               <h4>Speakers ({speakerUsers.length}/8)</h4>
+
+              {isCurrentUserHost && (
+                <div className="hostRoomControls">
+                  <button onClick={() => hostMuteAll(true)}>
+                    Mute All
+                  </button>
+
+                  <button onClick={() => hostMuteAll(false)}>
+                    Unmute All
+                  </button>
+                </div>
+              )}
+
               <div className="speakerCircleGrid">
                 {speakerUsers.length > 0 ? (
                   speakerUsers.map((item) => renderUserCard(item))
@@ -723,31 +737,32 @@ export default function RoomPage(props) {
 
           <div className="roomSidebarPanel">
             {roomSupporters?.length > 0 && (
-  <div className="supportersBox">
-    <h4>Top Supporters</h4>
+              <div className="supportersBox">
+                <h4>Top Supporters</h4>
 
-    {roomSupporters.map((item, index) => (
-      <div className="supporterItem" key={item.name}>
-        <span>#{index + 1} {item.name}</span>
-        <span>{item.total}</span>
-      </div>
-    ))}
-  </div>
-)}
+                {roomSupporters.map((item, index) => (
+                  <div className="supporterItem" key={item.name}>
+                    <span>#{index + 1} {item.name}</span>
+                    <span>{item.total}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <h4>Live Chat</h4>
 
             <div className="chatBox roomChatBox">
-  {messages.length > 0 ? (
-    messages.map((msg) => (
-      <div className="chatBubble" key={msg.id}>
-        <span className="chatUser">{msg.user}</span>
-        <span className="chatText">{msg.text}</span>
-      </div>
-    ))
-  ) : (
-    <p className="emptyHands">No messages yet</p>
-  )}
-</div>
+              {messages.length > 0 ? (
+                messages.map((msg) => (
+                  <div className="chatBubble" key={msg.id}>
+                    <span className="chatUser">{msg.user}</span>
+                    <span className="chatText">{msg.text}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="emptyHands">No messages yet</p>
+              )}
+            </div>
 
             <div className="chatInput roomChatInput">
               <input
