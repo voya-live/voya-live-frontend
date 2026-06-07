@@ -1007,3 +1007,70 @@ input {
   color: #94a3b8;
   text-align: center;
 }
+.chatBubble {
+  background: rgba(32, 42, 85, 0.85);
+  border: 1px solid #29345f;
+  padding: 9px 11px;
+  border-radius: 14px;
+  margin-bottom: 8px;
+}
+
+.chatUser {
+  display: block;
+  color: #c084fc;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 3px;
+}
+
+.chatText {
+  display: block;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.35;
+}
+.giftFeed {
+  position: fixed;
+  left: 20px;
+  bottom: 140px;
+
+  width: 300px;
+  z-index: 50;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  pointer-events: none;
+}
+
+.giftFeedItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 14px;
+
+  background: rgba(17, 23, 53, 0.92);
+  border: 1px solid rgba(192, 132, 252, 0.25);
+
+  border-radius: 999px;
+
+  animation: giftSlideIn 0.4s ease;
+}
+
+.giftFeedIcon {
+  font-size: 22px;
+}
+
+@keyframes giftSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}ٍ

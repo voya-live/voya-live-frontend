@@ -25,6 +25,7 @@ function App() {
   const [handRequests, setHandRequests] = useState([]);
   const [roomSpeakers, setRoomSpeakers] = useState([]);
   const [giftFeed, setGiftFeed] = useState([]);
+  const [roomSupporters, setRoomSupporters] = useState([]);
   const [giftAnimation, setGiftAnimation] = useState(null);
   const [levelUpData, setLevelUpData] = useState(null);
   const [authMode, setAuthMode] = useState("login");
@@ -54,7 +55,34 @@ function App() {
     });
 
     socket.on("room:gift", (gift) => {
-      setGiftFeed((prev) => [gift, ...prev].slice(0, 10));
+      setGiftFeed((prev) => [gift, ...prev].slice(0, 3));
+      setRoomSupporters((prev) => {
+  const existing = prev.find((item) => item.name === gift.user);
+
+  if (existing) {
+    return prev
+      .map((item) =>
+        item.name === gift.user
+          ? {
+              ...item,
+              total: item.total + Number(gift.amount || 0),
+            }
+          : item
+      )
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 3);
+  }
+
+  return [
+    ...prev,
+    {
+      name: gift.user,
+      total: Number(gift.amount || 0),
+    },
+  ]
+    .sort((a, b) => b.total - a.total)
+    .slice(0, 3);
+});
       setGiftAnimation(gift);
 
       setTimeout(() => {
@@ -211,6 +239,7 @@ function App() {
     setHandRequests([]);
     setRoomSpeakers([]);
     setGiftFeed([]);
+    setRoomSupporters([]);
     setGiftAnimation(null);
     setLevelUpData(null);
 
@@ -387,6 +416,39 @@ function App() {
         }, 3000);
       }
 
+setRoomSupporters((prev) => {
+  const existing = prev.find(
+    (x) => x.name === user.name
+  );
+
+  let updated;
+
+  if (existing) {
+    updated = prev.map((x) =>
+      x.name === user.name
+        ? {
+            ...x,
+            total:
+              x.total +
+              selectedGift.amount,
+          }
+        : x
+    );
+  } else {
+    updated = [
+      ...prev,
+      {
+        name: user.name,
+        total: selectedGift.amount,
+      },
+    ];
+  }
+
+  return updated.sort(
+    (a, b) => b.total - a.total
+  );
+});
+
       socket.emit("room:gift", {
         roomId,
         user: {
@@ -432,6 +494,7 @@ function App() {
   setHandRequests([]);
   setRoomSpeakers([]);
   setGiftFeed([]);
+  setRoomSupporters([]);
   setGiftAnimation(null);
   setLevelUpData(null);
 }
@@ -487,6 +550,7 @@ function App() {
           hostMuteUser={hostMuteUser}
           roomSpeakers={roomSpeakers}
           giftFeed={giftFeed}
+          roomSupporters={roomSupporters}
           giftAnimation={giftAnimation}
           levelUpData={levelUpData}
           currentUser={user}

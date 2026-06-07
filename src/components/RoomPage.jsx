@@ -48,6 +48,7 @@ export default function RoomPage(props) {
     isRoomMinimized,
     setIsRoomMinimized,
     leaveRoom,
+    roomSupporters,
   } = props;
 
   const [chatText, setChatText] = useState("");
@@ -616,14 +617,15 @@ export default function RoomPage(props) {
         </div>
 
         {giftFeed.length > 0 && (
-          <div className="giftFeed">
-            {giftFeed.map((gift) => (
-              <div className="giftFeedItem" key={gift.id}>
-                {gift.text}
-              </div>
-            ))}
-          </div>
-        )}
+  <div className="giftFeed">
+    {giftFeed.map((gift) => (
+      <div className="giftFeedItem" key={gift.id}>
+        <span className="giftFeedIcon">{gift.giftIcon}</span>
+        <span>{gift.text}</span>
+      </div>
+    ))}
+  </div>
+)}
 
         <div className="roomLayout">
           <div className="roomMain">
@@ -720,15 +722,32 @@ export default function RoomPage(props) {
           </div>
 
           <div className="roomSidebarPanel">
+            {roomSupporters?.length > 0 && (
+  <div className="supportersBox">
+    <h4>Top Supporters</h4>
+
+    {roomSupporters.map((item, index) => (
+      <div className="supporterItem" key={item.name}>
+        <span>#{index + 1} {item.name}</span>
+        <span>{item.total}</span>
+      </div>
+    ))}
+  </div>
+)}
             <h4>Live Chat</h4>
 
             <div className="chatBox roomChatBox">
-              {messages.map((msg) => (
-                <div className="chatMsg" key={msg.id}>
-                  <strong>{msg.user}:</strong> {msg.text}
-                </div>
-              ))}
-            </div>
+  {messages.length > 0 ? (
+    messages.map((msg) => (
+      <div className="chatBubble" key={msg.id}>
+        <span className="chatUser">{msg.user}</span>
+        <span className="chatText">{msg.text}</span>
+      </div>
+    ))
+  ) : (
+    <p className="emptyHands">No messages yet</p>
+  )}
+</div>
 
             <div className="chatInput roomChatInput">
               <input
