@@ -47,8 +47,22 @@ function App() {
     socket.on("room:speakersUpdate", (data) => setRoomSpeakers(data || []));
 
     socket.on("room:error", (data) => {
-      alert(data?.message || "Room error");
-    });
+  const message = data?.message || "Room error";
+
+  alert(message);
+
+  if (message === "Room is locked by host") {
+    setJoinedRoom(null);
+    setIsRoomMinimized(false);
+    setMessages([]);
+    setHandRequests([]);
+    setRoomSpeakers([]);
+    setGiftFeed([]);
+    setRoomSupporters([]);
+    setGiftAnimation(null);
+    setLevelUpData(null);
+  }
+});
 
     socket.on("room:gift", (gift) => {
       setGiftFeed((prev) => [gift, ...prev].slice(0, 3));
