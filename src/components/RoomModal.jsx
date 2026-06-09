@@ -580,7 +580,10 @@ export default function RoomModal(props) {
 
         <h2>{joinedRoom.name}</h2>
         <p>Hosted by {joinedRoom.host}</p>
-        <p>{roomUsers.length} users live now</p>
+        <p>
+  {roomUsers.length}{" "}
+  {roomUsers.length === 1 ? "user" : "users"} live now
+</p>
 
         {giftFeed.length > 0 && (
           <div className="giftFeed">
