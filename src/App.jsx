@@ -43,26 +43,26 @@ function App() {
     );
 
     socket.on("room:handRequests", (data) => setHandRequests(data || []));
-
     socket.on("room:speakersUpdate", (data) => setRoomSpeakers(data || []));
 
     socket.on("room:error", (data) => {
-  const message = data?.message || "Room error";
+      const message = data?.message || "Room error";
 
-  alert(message);
+      alert(message);
 
-  if (message === "Room is locked by host") {
-    setJoinedRoom(null);
-    setIsRoomMinimized(false);
-    setMessages([]);
-    setHandRequests([]);
-    setRoomSpeakers([]);
-    setGiftFeed([]);
-    setRoomSupporters([]);
-    setGiftAnimation(null);
-    setLevelUpData(null);
-  }
-});
+      if (message === "Room is locked by host") {
+        setJoinedRoom(null);
+        setIsRoomMinimized(false);
+        setMessages([]);
+        setHandRequests([]);
+        setRoomSpeakers([]);
+        setGiftFeed([]);
+        setRoomSupporters([]);
+        setGiftAnimation(null);
+        setLevelUpData(null);
+        loadRooms();
+      }
+    });
 
     socket.on("room:gift", (gift) => {
       setGiftFeed((prev) => [gift, ...prev].slice(0, 3));
@@ -120,8 +120,10 @@ function App() {
       const response = await fetch(`${backendUrl}/api/rooms`);
       const data = await response.json();
       setRooms(data.rooms || []);
+      return data.rooms || [];
     } catch {
       alert("Failed to load rooms");
+      return [];
     }
   }
 
@@ -241,18 +243,32 @@ function App() {
     return Number(agoraUid);
   }
 
-  function joinRoom(room) {
-    const roomId = String(room._id || room.id);
+  async function joinRoom(room) {
+    const originalRoomId = String(room._id || room.id);
+
+    let latestRoom = room;
+
+    try {
+      const latestRooms = await loadRooms();
+
+      latestRoom =
+        latestRooms.find(
+          (item) => String(item._id || item.id) === originalRoomId
+        ) || room;
+    } catch {
+      console.log("Failed to refresh room before join");
+    }
+
+    const roomId = String(latestRoom._id || latestRoom.id);
     const agoraUid = getAgoraUid();
+    const isHost = latestRoom.host === user.name;
 
-    const isHost = room.host === user.name;
-
-    if (room.locked && !isHost) {
+    if (latestRoom.locked && !isHost) {
       alert("Room is locked by host");
       return;
     }
 
-    setJoinedRoom(room);
+    setJoinedRoom(latestRoom);
     setIsRoomMinimized(false);
     setMessages([]);
     setHandRequests([]);
@@ -340,6 +356,7 @@ function App() {
           String(room._id || room.id) === roomId ? data.room : room
         )
       );
+
       loadRooms();
     } catch {
       alert("Lock room request failed");
@@ -373,6 +390,7 @@ function App() {
           String(room._id || room.id) === roomId ? data.room : room
         )
       );
+
       loadRooms();
     } catch {
       alert("Unlock room request failed");
@@ -629,7 +647,9 @@ function App() {
           <div>
             <strong>{joinedRoom.name}</strong>
             <span>
-              {liveRooms[String(joinedRoom._id || joinedRoom.id)]?.users?.length || 0} live
+              {liveRooms[String(joinedRoom._id || joinedRoom.id)]?.users
+                ?.length || 0}{" "}
+              live
             </span>
           </div>
 
