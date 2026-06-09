@@ -64,7 +64,8 @@ function App() {
       }
     });
     socket.on("room:kicked", (data) => {
-  alert(data?.message || "You have been removed from the room");
+  const message =
+    data?.message || "You have been removed from the room";
 
   setJoinedRoom(null);
   setIsRoomMinimized(false);
@@ -77,6 +78,10 @@ function App() {
   setLevelUpData(null);
 
   loadRooms();
+
+  setTimeout(() => {
+    alert(message);
+  }, 100);
 });
 
     socket.on("room:gift", (gift) => {
