@@ -50,7 +50,10 @@ function App() {
 
       alert(message);
 
-      if (message === "Room is locked by host") {
+      if (
+        message === "Room is locked by host" ||
+        message === "Incorrect room password"
+      ) {
         setJoinedRoom(null);
         setIsRoomMinimized(false);
         setMessages([]);
@@ -63,26 +66,27 @@ function App() {
         loadRooms();
       }
     });
+
     socket.on("room:kicked", (data) => {
-  const message =
-    data?.message || "You have been removed from the room";
+      const message =
+        data?.message || "You have been removed from the room";
 
-  setJoinedRoom(null);
-  setIsRoomMinimized(false);
-  setMessages([]);
-  setHandRequests([]);
-  setRoomSpeakers([]);
-  setGiftFeed([]);
-  setRoomSupporters([]);
-  setGiftAnimation(null);
-  setLevelUpData(null);
+      setJoinedRoom(null);
+      setIsRoomMinimized(false);
+      setMessages([]);
+      setHandRequests([]);
+      setRoomSpeakers([]);
+      setGiftFeed([]);
+      setRoomSupporters([]);
+      setGiftAnimation(null);
+      setLevelUpData(null);
 
-  loadRooms();
+      loadRooms();
 
-  setTimeout(() => {
-    alert(message);
-  }, 100);
-});
+      setTimeout(() => {
+        alert(message);
+      }, 100);
+    });
 
     socket.on("room:gift", (gift) => {
       setGiftFeed((prev) => [gift, ...prev].slice(0, 3));
@@ -289,6 +293,18 @@ function App() {
       return;
     }
 
+    let roomPassword = "";
+
+    if (latestRoom.password && !isHost) {
+      const enteredPassword = window.prompt("Enter room password");
+
+      if (!enteredPassword) {
+        return;
+      }
+
+      roomPassword = enteredPassword.trim();
+    }
+
     setJoinedRoom(latestRoom);
     setIsRoomMinimized(false);
     setMessages([]);
@@ -306,6 +322,7 @@ function App() {
         id: user.phone,
         name: user.name,
         isHost,
+        roomPassword,
         level: user.level || 1,
         experience: user.experience || 0,
         vipLevel: user.vipLevel || 0,
@@ -418,6 +435,74 @@ function App() {
     }
   }
 
+  async function setRoomPassword() {
+    if (!joinedRoom) return;
+
+    const password = window.prompt("Enter room password");
+
+    if (!password?.trim()) return;
+
+    const token = localStorage.getItem("voya_token");
+    const roomId = String(joinedRoom._id || joinedRoom.id);
+
+    try {
+      const response = await fetch(
+        `${backendUrl}/api/rooms/${roomId}/password`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            password: password.trim(),
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return alert(data.error || "Failed to set room password");
+      }
+
+      setJoinedRoom(data.room);
+      loadRooms();
+    } catch {
+      alert("Set password request failed");
+    }
+  }
+
+  async function removeRoomPassword() {
+    if (!joinedRoom) return;
+
+    const token = localStorage.getItem("voya_token");
+    const roomId = String(joinedRoom._id || joinedRoom.id);
+
+    try {
+      const response = await fetch(
+        `${backendUrl}/api/rooms/${roomId}/password`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return alert(data.error || "Failed to remove room password");
+      }
+
+      setJoinedRoom(data.room);
+      loadRooms();
+    } catch {
+      alert("Remove password request failed");
+    }
+  }
+
   function raiseHand() {
     if (!joinedRoom || !user) return;
 
@@ -464,16 +549,17 @@ function App() {
       userId,
     });
   }
+
   function kickUser(userId) {
-  if (!joinedRoom) return;
+    if (!joinedRoom) return;
 
-  const roomId = String(joinedRoom._id || joinedRoom.id);
+    const roomId = String(joinedRoom._id || joinedRoom.id);
 
-  socket.emit("room:kickUser", {
-    roomId,
-    userId,
-  });
-}
+    socket.emit("room:kickUser", {
+      roomId,
+      userId,
+    });
+  }
 
   async function recharge() {
     const token = localStorage.getItem("voya_token");
@@ -662,6 +748,8 @@ function App() {
           kickUser={kickUser}
           lockRoom={lockRoom}
           unlockRoom={unlockRoom}
+          setRoomPassword={setRoomPassword}
+          removeRoomPassword={removeRoomPassword}
           roomSpeakers={roomSpeakers}
           giftFeed={giftFeed}
           roomSupporters={roomSupporters}

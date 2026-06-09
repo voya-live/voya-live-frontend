@@ -1131,3 +1131,29 @@ input {
 .dangerBtn:hover {
   background: #dc2626 !important;
 }
+.passwordBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  background: #38bdf8;
+  color: #06121f;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.setPasswordBtn {
+  background: #38bdf8 !important;
+  color: #06121f !important;
+  font-weight: 700;
+}
+
+.removePasswordBtn {
+  background: #64748b !important;
+  color: white !important;
+  font-weight: 700;
+}

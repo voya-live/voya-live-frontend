@@ -44,6 +44,8 @@ export default function RoomPage(props) {
     kickUser,
     lockRoom,
     unlockRoom,
+    setRoomPassword,
+    removeRoomPassword,
     roomSpeakers,
     giftFeed,
     giftAnimation,
@@ -623,8 +625,12 @@ export default function RoomPage(props) {
             <h2>
   {joinedRoom.name}
   {joinedRoom.locked && (
-    <span className="lockedBadge">🔒 Locked</span>
-  )}
+  <span className="lockedBadge">🔒 Locked</span>
+)}
+
+{joinedRoom.password && (
+  <span className="passwordBadge">🔑 Password</span>
+)}
 </h2>
             <p>Hosted by {joinedRoom.host}</p>
             <p>
@@ -681,6 +687,15 @@ export default function RoomPage(props) {
         Lock Room
       </button>
     )}
+    {joinedRoom.password ? (
+  <button className="removePasswordBtn" onClick={removeRoomPassword}>
+    Remove Password
+  </button>
+) : (
+  <button className="setPasswordBtn" onClick={setRoomPassword}>
+    Set Password
+  </button>
+)}
   </div>
 )}
 
