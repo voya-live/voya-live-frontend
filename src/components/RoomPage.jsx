@@ -41,6 +41,7 @@ export default function RoomPage(props) {
     removeSpeaker,
     hostMuteUser,
     hostMuteAll,
+    kickUser,
     lockRoom,
     unlockRoom,
     roomSpeakers,
@@ -466,6 +467,20 @@ export default function RoomPage(props) {
             >
               Remove Mic
             </button>
+            <button
+  className="smallControlBtn dangerBtn"
+  onClick={() => {
+    if (
+      window.confirm(
+        `Remove ${item.name} from room?`
+      )
+    ) {
+      kickUser(item.id);
+    }
+  }}
+>
+  Kick
+</button>
           </div>
         )}
       </div>

@@ -1123,3 +1123,11 @@ input {
 .hostRoomControls button {
   height: 38px;
 }
+.dangerBtn {
+  background: #ef4444 !important;
+  color: white !important;
+}
+
+.dangerBtn:hover {
+  background: #dc2626 !important;
+}

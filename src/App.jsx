@@ -459,6 +459,16 @@ function App() {
       userId,
     });
   }
+  function kickUser(userId) {
+  if (!joinedRoom) return;
+
+  const roomId = String(joinedRoom._id || joinedRoom.id);
+
+  socket.emit("room:kickUser", {
+    roomId,
+    userId,
+  });
+}
 
   async function recharge() {
     const token = localStorage.getItem("voya_token");
@@ -644,6 +654,7 @@ function App() {
           removeSpeaker={removeSpeaker}
           hostMuteUser={hostMuteUser}
           hostMuteAll={hostMuteAll}
+          kickUser={kickUser}
           lockRoom={lockRoom}
           unlockRoom={unlockRoom}
           roomSpeakers={roomSpeakers}
