@@ -326,6 +326,7 @@ function App() {
           String(room._id || room.id) === roomId ? data.room : room
         )
       );
+      loadRooms();
     } catch {
       alert("Lock room request failed");
     }
@@ -358,6 +359,7 @@ function App() {
           String(room._id || room.id) === roomId ? data.room : room
         )
       );
+      loadRooms();
     } catch {
       alert("Unlock room request failed");
     }
