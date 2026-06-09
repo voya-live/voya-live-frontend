@@ -63,6 +63,21 @@ function App() {
         loadRooms();
       }
     });
+    socket.on("room:kicked", (data) => {
+  alert(data?.message || "You have been removed from the room");
+
+  setJoinedRoom(null);
+  setIsRoomMinimized(false);
+  setMessages([]);
+  setHandRequests([]);
+  setRoomSpeakers([]);
+  setGiftFeed([]);
+  setRoomSupporters([]);
+  setGiftAnimation(null);
+  setLevelUpData(null);
+
+  loadRooms();
+});
 
     socket.on("room:gift", (gift) => {
       setGiftFeed((prev) => [gift, ...prev].slice(0, 3));
@@ -111,6 +126,7 @@ function App() {
       socket.off("room:handRequests");
       socket.off("room:speakersUpdate");
       socket.off("room:error");
+      socket.off("room:kicked");
       socket.off("room:gift");
     };
   }, []);
