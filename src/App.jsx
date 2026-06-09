@@ -42,13 +42,9 @@ function App() {
       setMessages((prev) => [...prev, message])
     );
 
-    socket.on("room:handRequests", (data) => {
-      setHandRequests(data || []);
-    });
+    socket.on("room:handRequests", (data) => setHandRequests(data || []));
 
-    socket.on("room:speakersUpdate", (data) => {
-      setRoomSpeakers(data || []);
-    });
+    socket.on("room:speakersUpdate", (data) => setRoomSpeakers(data || []));
 
     socket.on("room:error", (data) => {
       alert(data?.message || "Room error");
@@ -235,6 +231,13 @@ function App() {
     const roomId = String(room._id || room.id);
     const agoraUid = getAgoraUid();
 
+    const isHost = room.host === user.name;
+
+    if (room.locked && !isHost) {
+      alert("Room is locked by host");
+      return;
+    }
+
     setJoinedRoom(room);
     setIsRoomMinimized(false);
     setMessages([]);
@@ -251,7 +254,7 @@ function App() {
       user: {
         id: user.phone,
         name: user.name,
-        isHost: room.host === user.name,
+        isHost,
         level: user.level || 1,
         experience: user.experience || 0,
         vipLevel: user.vipLevel || 0,
@@ -294,6 +297,70 @@ function App() {
       roomId,
       muted,
     });
+  }
+
+  async function lockRoom() {
+    if (!joinedRoom) return;
+
+    const token = localStorage.getItem("voya_token");
+    const roomId = String(joinedRoom._id || joinedRoom.id);
+
+    try {
+      const response = await fetch(`${backendUrl}/api/rooms/${roomId}/lock`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return alert(data.error || "Failed to lock room");
+      }
+
+      setJoinedRoom(data.room);
+
+      setRooms((prev) =>
+        prev.map((room) =>
+          String(room._id || room.id) === roomId ? data.room : room
+        )
+      );
+    } catch {
+      alert("Lock room request failed");
+    }
+  }
+
+  async function unlockRoom() {
+    if (!joinedRoom) return;
+
+    const token = localStorage.getItem("voya_token");
+    const roomId = String(joinedRoom._id || joinedRoom.id);
+
+    try {
+      const response = await fetch(`${backendUrl}/api/rooms/${roomId}/unlock`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return alert(data.error || "Failed to unlock room");
+      }
+
+      setJoinedRoom(data.room);
+
+      setRooms((prev) =>
+        prev.map((room) =>
+          String(room._id || room.id) === roomId ? data.room : room
+        )
+      );
+    } catch {
+      alert("Unlock room request failed");
+    }
   }
 
   function raiseHand() {
@@ -527,6 +594,8 @@ function App() {
           removeSpeaker={removeSpeaker}
           hostMuteUser={hostMuteUser}
           hostMuteAll={hostMuteAll}
+          lockRoom={lockRoom}
+          unlockRoom={unlockRoom}
           roomSpeakers={roomSpeakers}
           giftFeed={giftFeed}
           roomSupporters={roomSupporters}

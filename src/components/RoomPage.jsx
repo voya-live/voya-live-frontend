@@ -41,6 +41,8 @@ export default function RoomPage(props) {
     removeSpeaker,
     hostMuteUser,
     hostMuteAll,
+    lockRoom,
+    unlockRoom,
     roomSpeakers,
     giftFeed,
     giftAnimation,
@@ -605,7 +607,10 @@ export default function RoomPage(props) {
           <div>
             <h2>{joinedRoom.name}</h2>
             <p>Hosted by {joinedRoom.host}</p>
-            <p>{roomUsers.length} users live now</p>
+            <p>
+  {roomUsers.length} users live now{" "}
+  {joinedRoom.locked && <span className="lockedBadge">Locked</span>}
+</p>
           </div>
 
           <div className="roomHeaderActions">
@@ -638,16 +643,26 @@ export default function RoomPage(props) {
               <h4>Speakers ({speakerUsers.length}/8)</h4>
 
               {isCurrentUserHost && (
-                <div className="hostRoomControls">
-                  <button onClick={() => hostMuteAll(true)}>
-                    Mute All
-                  </button>
+  <div className="hostRoomControls">
+    <button onClick={() => hostMuteAll(true)}>
+      Mute All
+    </button>
 
-                  <button onClick={() => hostMuteAll(false)}>
-                    Unmute All
-                  </button>
-                </div>
-              )}
+    <button onClick={() => hostMuteAll(false)}>
+      Unmute All
+    </button>
+
+    {joinedRoom.locked ? (
+      <button className="unlockRoomBtn" onClick={unlockRoom}>
+        Unlock Room
+      </button>
+    ) : (
+      <button className="lockRoomBtn" onClick={lockRoom}>
+        Lock Room
+      </button>
+    )}
+  </div>
+)}
 
               <div className="speakerCircleGrid">
                 {speakerUsers.length > 0 ? (
