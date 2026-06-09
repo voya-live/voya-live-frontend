@@ -1078,6 +1078,7 @@ input {
   display: flex;
   gap: 10px;
   margin: 12px 0 16px;
+  flex-wrap: wrap;
 }
 
 .hostRoomControls button {
@@ -1088,24 +1089,29 @@ input {
   font-weight: 700;
 }
 
-.hostRoomControls button:last-child {
-  background: #22c55e;
-}
+
 .lockRoomBtn {
   background: #f59e0b !important;
+  color: #111;
+  font-weight: 700;
 }
 
 .unlockRoomBtn {
   background: #22c55e !important;
+  color: white;
+  font-weight: 700;
 }
-
 .lockedBadge {
-  display: inline-block;
-  margin-left: 8px;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 10px;
   background: #f59e0b;
   color: #111;
-  padding: 4px 8px;
+  padding: 5px 12px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 800;
+}
+.hostRoomControls button {
+  height: 38px;
 }

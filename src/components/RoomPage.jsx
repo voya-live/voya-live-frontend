@@ -605,12 +605,14 @@ export default function RoomPage(props) {
 
         <div className="roomTopHeader">
           <div>
-            <h2>{joinedRoom.name}</h2>
+            <h2>
+  {joinedRoom.name}
+  {joinedRoom.locked && (
+    <span className="lockedBadge">🔒 Locked</span>
+  )}
+</h2>
             <p>Hosted by {joinedRoom.host}</p>
-            <p>
-  {roomUsers.length} users live now{" "}
-  {joinedRoom.locked && <span className="lockedBadge">Locked</span>}
-</p>
+            <p>{roomUsers.length} users live now</p>
           </div>
 
           <div className="roomHeaderActions">
