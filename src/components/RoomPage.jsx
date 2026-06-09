@@ -612,7 +612,10 @@ export default function RoomPage(props) {
   )}
 </h2>
             <p>Hosted by {joinedRoom.host}</p>
-            <p>{roomUsers.length} users live now</p>
+            <p>
+  {roomUsers.length}{" "}
+  {roomUsers.length === 1 ? "user" : "users"} live now
+</p>
           </div>
 
           <div className="roomHeaderActions">
