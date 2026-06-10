@@ -42,6 +42,7 @@ export default function RoomPage(props) {
     hostMuteUser,
     hostMuteAll,
     kickUser,
+    banUser,    
     lockRoom,
     unlockRoom,
     setRoomPassword,
@@ -482,6 +483,16 @@ export default function RoomPage(props) {
   }}
 >
   Kick
+</button>
+<button
+  className="smallControlBtn banBtn"
+  onClick={() => {
+    if (window.confirm(`Ban ${item.name} from this room?`)) {
+      banUser(item.id);
+    }
+  }}
+>
+  Ban
 </button>
           </div>
         )}

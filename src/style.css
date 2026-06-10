@@ -1157,3 +1157,11 @@ input {
   color: white !important;
   font-weight: 700;
 }
+.banBtn {
+  background: #7f1d1d !important;
+  color: white !important;
+}
+
+.banBtn:hover {
+  background: #991b1b !important;
+}
