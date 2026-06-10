@@ -58,6 +58,11 @@ export default function RoomPage(props) {
     setIsRoomMinimized,
     leaveRoom,
     roomSupporters,
+    roomMembers,
+    memberRequests,
+    roomAdmins,
+    requestMembership,
+    approveMember,
   } = props;
 
   const [chatText, setChatText] = useState("");
@@ -68,6 +73,7 @@ export default function RoomPage(props) {
   const [selectedUser, setSelectedUser] = useState(null);
   const [profileData, setProfileData] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isRoomPanelOpen, setIsRoomPanelOpen] = useState(false);
 
   const micRef = useRef(null);
   const joinedRef = useRef(false);
@@ -567,6 +573,71 @@ export default function RoomPage(props) {
           </div>
         )}
 
+        {isRoomPanelOpen && (
+  <div className="profilePopup">
+    <div className="profileCard">
+      <button
+        className="profileClose"
+        onClick={() => setIsRoomPanelOpen(false)}
+      >
+        ×
+      </button>
+
+      <h2>{joinedRoom.name}</h2>
+
+      <p>Host: {joinedRoom.host}</p>
+
+      <p>Members: {roomMembers?.length || 0}</p>
+
+      <p>Admins: {roomAdmins?.length || 0}</p>
+
+      <p>Visitors Now: {roomUsers?.length || 0}</p>
+      {!isCurrentUserHost && (
+  <button
+    className="profileActionBtn"
+    onClick={requestMembership}
+  >
+    Apply Membership
+  </button>
+)}
+
+{isCurrentUserHost && memberRequests?.length > 0 && (
+  <>
+    <hr />
+
+    <h4>Member Requests</h4>
+
+    {memberRequests.map((request) => (
+      <div className="supporterItem" key={request.id}>
+        <span>{request.name}</span>
+
+        <button
+          className="smallControlBtn"
+          onClick={() => approveMember(request.id, request.name)}
+        >
+          Approve
+        </button>
+      </div>
+    ))}
+  </>
+)}
+      <hr />
+
+      <h4>Room Members</h4>
+
+      {roomMembers?.length > 0 ? (
+        roomMembers.map((member) => (
+          <div key={member.id}>
+            👤 {member.name}
+          </div>
+        ))
+      ) : (
+        <p>No members yet</p>
+      )}
+    </div>
+  </div>
+)}
+
         {selectedUser && (
           <div className="profilePopup">
             <div className="profileCard">
@@ -635,15 +706,19 @@ export default function RoomPage(props) {
 
         <div className="roomTopHeader">
           <div>
-            <h2>
+            <h2
+  style={{ cursor: "pointer" }}
+  onClick={() => setIsRoomPanelOpen(true)}
+>
   {joinedRoom.name}
-  {joinedRoom.locked && (
-  <span className="lockedBadge">🔒 Locked</span>
-)}
 
-{joinedRoom.password && (
-  <span className="passwordBadge">🔑 Password</span>
-)}
+  {joinedRoom.locked && (
+    <span className="lockedBadge">🔒 Locked</span>
+  )}
+
+  {joinedRoom.password && (
+    <span className="passwordBadge">🔑 Password</span>
+  )}
 </h2>
             <p>Hosted by {joinedRoom.host}</p>
             <p>

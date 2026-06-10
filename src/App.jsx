@@ -27,6 +27,9 @@ function App() {
   const [giftFeed, setGiftFeed] = useState([]);
   const [roomSupporters, setRoomSupporters] = useState([]);
   const [bannedUsers, setBannedUsers] = useState([]);
+  const [roomMembers, setRoomMembers] = useState([]);
+  const [memberRequests, setMemberRequests] = useState([]);
+  const [roomAdmins, setRoomAdmins] = useState([]);
   const [giftAnimation, setGiftAnimation] = useState(null);
   const [levelUpData, setLevelUpData] = useState(null);
   const [authMode, setAuthMode] = useState("login");
@@ -47,6 +50,18 @@ function App() {
     socket.on("room:speakersUpdate", (data) => setRoomSpeakers(data || []));
     socket.on("room:bannedUsers", (data) => {
   setBannedUsers(data || []);
+});
+
+socket.on("room:membersUpdate", (data) => {
+  setRoomMembers(data || []);
+});
+
+socket.on("room:memberRequests", (data) => {
+  setMemberRequests(data || []);
+});
+
+socket.on("room:adminsUpdate", (data) => {
+  setRoomAdmins(data || []);
 });
 
     socket.on("room:error", (data) => {
@@ -142,6 +157,9 @@ function App() {
       socket.off("room:error");
       socket.off("room:kicked");
       socket.off("room:gift");
+      socket.off("room:membersUpdate");
+      socket.off("room:memberRequests");
+      socket.off("room:adminsUpdate");
     };
   }, []);
 
@@ -586,6 +604,31 @@ function unbanUser(userId) {
   });
 }
 
+function requestMembership() {
+  if (!joinedRoom || !user) return;
+
+  const roomId = String(joinedRoom._id || joinedRoom.id);
+
+  socket.emit("room:requestMembership", {
+    roomId,
+    user: {
+      id: user.phone,
+      name: user.name,
+    },
+  });
+}
+function approveMember(userId, name) {
+  if (!joinedRoom) return;
+
+  const roomId = String(joinedRoom._id || joinedRoom.id);
+
+  socket.emit("room:approveMember", {
+    roomId,
+    userId,
+    name,
+  });
+}
+ 
   async function recharge() {
     const token = localStorage.getItem("voya_token");
 
@@ -773,6 +816,11 @@ function unbanUser(userId) {
           kickUser={kickUser}
           banUser={banUser}
           bannedUsers={bannedUsers}
+          roomMembers={roomMembers}
+          requestMembership={requestMembership}
+          approveMember={approveMember}
+          memberRequests={memberRequests}
+          roomAdmins={roomAdmins}
           unbanUser={unbanUser}
           lockRoom={lockRoom}
           unlockRoom={unlockRoom}
