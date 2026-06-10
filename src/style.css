@@ -1165,3 +1165,6 @@ input {
 .banBtn:hover {
   background: #991b1b !important;
 }
+.supporterItem button {
+  margin-left: auto;
+}

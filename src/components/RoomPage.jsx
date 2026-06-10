@@ -42,7 +42,9 @@ export default function RoomPage(props) {
     hostMuteUser,
     hostMuteAll,
     kickUser,
-    banUser,    
+    banUser,
+    unbanUser,
+    bannedUsers,
     lockRoom,
     unlockRoom,
     setRoomPassword,
@@ -797,6 +799,24 @@ export default function RoomPage(props) {
           </div>
 
           <div className="roomSidebarPanel">
+            {isCurrentUserHost && bannedUsers?.length > 0 && (
+  <div className="supportersBox">
+    <h4>Banned Users</h4>
+
+    {bannedUsers.map((user) => (
+      <div className="supporterItem" key={user.id}>
+        <span>{user.name}</span>
+
+        <button
+          className="smallControlBtn"
+          onClick={() => unbanUser(user.id)}
+        >
+          Unban
+        </button>
+      </div>
+    ))}
+  </div>
+)}
             {roomSupporters?.length > 0 && (
               <div className="supportersBox">
                 <h4>Top Supporters</h4>

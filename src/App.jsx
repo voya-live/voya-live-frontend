@@ -26,6 +26,7 @@ function App() {
   const [roomSpeakers, setRoomSpeakers] = useState([]);
   const [giftFeed, setGiftFeed] = useState([]);
   const [roomSupporters, setRoomSupporters] = useState([]);
+  const [bannedUsers, setBannedUsers] = useState([]);
   const [giftAnimation, setGiftAnimation] = useState(null);
   const [levelUpData, setLevelUpData] = useState(null);
   const [authMode, setAuthMode] = useState("login");
@@ -44,6 +45,9 @@ function App() {
 
     socket.on("room:handRequests", (data) => setHandRequests(data || []));
     socket.on("room:speakersUpdate", (data) => setRoomSpeakers(data || []));
+    socket.on("room:bannedUsers", (data) => {
+  setBannedUsers(data || []);
+});
 
     socket.on("room:error", (data) => {
       const message = data?.message || "Room error";
@@ -134,6 +138,7 @@ function App() {
       socket.off("room:chat");
       socket.off("room:handRequests");
       socket.off("room:speakersUpdate");
+      socket.off("room:bannedUsers");
       socket.off("room:error");
       socket.off("room:kicked");
       socket.off("room:gift");
@@ -570,6 +575,16 @@ function App() {
     userId,
   });
 }
+function unbanUser(userId) {
+  if (!joinedRoom) return;
+
+  const roomId = String(joinedRoom._id || joinedRoom.id);
+
+  socket.emit("room:unbanUser", {
+    roomId,
+    userId,
+  });
+}
 
   async function recharge() {
     const token = localStorage.getItem("voya_token");
@@ -757,6 +772,8 @@ function App() {
           hostMuteAll={hostMuteAll}
           kickUser={kickUser}
           banUser={banUser}
+          bannedUsers={bannedUsers}
+          unbanUser={unbanUser}
           lockRoom={lockRoom}
           unlockRoom={unlockRoom}
           setRoomPassword={setRoomPassword}
