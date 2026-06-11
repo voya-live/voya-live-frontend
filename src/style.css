@@ -1168,3 +1168,8 @@ input {
 .supporterItem button {
   margin-left: auto;
 }
+.adminBadge {
+  color: #fde68a;
+  font-size: 12px;
+  font-weight: 800;
+}

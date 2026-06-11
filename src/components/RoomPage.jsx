@@ -61,6 +61,8 @@ export default function RoomPage(props) {
     roomMembers,
     memberRequests,
     roomAdmins,
+    addAdmin,
+    removeAdmin,
     requestMembership,
     approveMember,
   } = props;
@@ -362,6 +364,11 @@ export default function RoomPage(props) {
   function isRoomSpeaker(item) {
     return Boolean(getSpeaker(item));
   }
+  function isRoomAdminUser(userId) {
+  return Boolean(
+    roomAdmins?.find((admin) => admin.id === userId)
+  );
+}
 
   function getUserRole(item) {
     if (item.isHost) return "Host";
@@ -457,6 +464,9 @@ export default function RoomPage(props) {
         {isRoomSpeaker(item) && !item.isHost && (
           <div className="speakerBadge">🎤 Speaker</div>
         )}
+        {isRoomAdminUser(item.id) && (
+  <div className="adminBadge">⭐ Admin</div>
+)}
 
         {muted && <div className="mutedBadge">🔇 Muted</div>}
 
@@ -693,6 +703,31 @@ export default function RoomPage(props) {
                   {isFollowing ? "Unfollow" : "Follow"}
                 </button>
               )}
+              {isCurrentUserHost &&
+  selectedUser.id !== currentUser?.phone && (
+    isRoomAdminUser(selectedUser.id) ? (
+      <button
+        className="profileActionBtn"
+        onClick={() =>
+          removeAdmin(selectedUser.id)
+        }
+      >
+        Remove Admin
+      </button>
+    ) : (
+      <button
+        className="profileActionBtn"
+        onClick={() =>
+          addAdmin(
+            selectedUser.id,
+            selectedUser.name
+          )
+        }
+      >
+        Make Admin
+      </button>
+    )
+)}
 
               <button
                 className="profileActionBtn"

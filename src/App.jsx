@@ -628,6 +628,28 @@ function approveMember(userId, name) {
     name,
   });
 }
+function addAdmin(userId, name) {
+  if (!joinedRoom) return;
+
+  const roomId = String(joinedRoom._id || joinedRoom.id);
+
+  socket.emit("room:addAdmin", {
+    roomId,
+    userId,
+    name,
+  });
+}
+
+function removeAdmin(userId) {
+  if (!joinedRoom) return;
+
+  const roomId = String(joinedRoom._id || joinedRoom.id);
+
+  socket.emit("room:removeAdmin", {
+    roomId,
+    userId,
+  });
+}
  
   async function recharge() {
     const token = localStorage.getItem("voya_token");
@@ -821,6 +843,8 @@ function approveMember(userId, name) {
           approveMember={approveMember}
           memberRequests={memberRequests}
           roomAdmins={roomAdmins}
+          addAdmin={addAdmin}
+          removeAdmin={removeAdmin}
           unbanUser={unbanUser}
           lockRoom={lockRoom}
           unlockRoom={unlockRoom}
