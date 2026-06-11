@@ -370,6 +370,30 @@ export default function RoomPage(props) {
   );
 }
 
+function isCurrentUserAdmin() {
+  return isRoomAdminUser(currentUser?.phone);
+}
+
+function canCurrentUserManage() {
+  return isCurrentUserHost || isCurrentUserAdmin();
+}
+
+function canManageSelectedUser(userItem) {
+  if (!userItem) return false;
+
+  if (isCurrentUserHost) return userItem.id !== currentUser?.phone;
+
+  if (isCurrentUserAdmin()) {
+    if (userItem.isHost) return false;
+    if (isRoomAdminUser(userItem.id)) return false;
+
+    return userItem.id !== currentUser?.phone;
+  }
+
+  return false;
+}
+
+
   function getUserRole(item) {
     if (item.isHost) return "Host";
     if (isRoomSpeaker(item)) return "Speaker";
@@ -470,7 +494,9 @@ export default function RoomPage(props) {
 
         {muted && <div className="mutedBadge">🔇 Muted</div>}
 
-        {isCurrentUserHost && !item.isHost && isRoomSpeaker(item) && (
+        {canCurrentUserManage() &&
+  canManageSelectedUser(item) &&
+  isRoomSpeaker(item) && (
           <div
             className="hostControls"
             onClick={(e) => e.stopPropagation()}
@@ -665,6 +691,9 @@ export default function RoomPage(props) {
               <h3>{selectedUser.name}</h3>
 
               {renderVipBadge(profileData?.vipLevel)}
+              {isRoomAdminUser(selectedUser.id) && (
+  <div className="adminBadge">⭐ Admin</div>
+)}
 
               <p>Role: {getUserRole(selectedUser)}</p>
               <p>Status: {getUserStatus(selectedUser)}</p>
@@ -880,8 +909,8 @@ export default function RoomPage(props) {
                 </p>
               )}
 
-              {isCurrentUserHost && (
-                <div className="handPanel">
+              {canCurrentUserManage() && (
+  <div className="handPanel">
                   <h4>Hand Requests</h4>
 
                   {handRequests.length === 0 ? (
