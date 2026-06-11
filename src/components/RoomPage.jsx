@@ -626,6 +626,17 @@ function canManageSelectedUser(userItem) {
       <p>Members: {roomMembers?.length || 0}</p>
 
       <p>Admins: {roomAdmins?.length || 0}</p>
+      <h4>Room Admins</h4>
+
+{roomAdmins?.length > 0 ? (
+  roomAdmins.map((admin) => (
+    <div key={admin.id}>
+      ⭐ {admin.name}
+    </div>
+  ))
+) : (
+  <p>No admins yet</p>
+)}
 
       <p>Visitors Now: {roomUsers?.length || 0}</p>
       {!isCurrentUserHost && (
