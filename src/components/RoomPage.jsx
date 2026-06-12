@@ -572,6 +572,24 @@ function canManageSelectedUser(userItem) {
     );
   }
 
+  function handleCoverFileChange(event) {
+  const file = event.target.files?.[0];
+
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    const result = reader.result;
+
+    if (typeof result === "string") {
+      setRoomCoverText(result);
+      saveRoomCover(result);
+    }
+  };
+
+  reader.readAsDataURL(file);
+}
   function renderHostCard() {
     const host = hostUsers[0];
 
@@ -706,6 +724,15 @@ function canManageSelectedUser(userItem) {
 >
   Save Cover
 </button>
+<input
+  type="file"
+  accept="image/*"
+  onChange={handleCoverFileChange}
+  style={{
+    width: "100%",
+    marginTop: "10px",
+  }}
+/>
   </>
 )}
 
