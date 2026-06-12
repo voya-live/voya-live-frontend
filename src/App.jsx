@@ -242,6 +242,7 @@ socket.on("room:descriptionUpdate", (data) => {
         experience: data.user.experience || 0,
         totalSpent: data.user.totalSpent || 0,
         vipLevel: data.user.vipLevel || 0,
+        profileImage: data.user.profileImage || "",
       };
 
       localStorage.setItem("voya_token", data.token);
@@ -859,7 +860,13 @@ async function saveRoomCover(coverImage) {
     <main className={joinedRoom && !isRoomMinimized ? "app roomMode" : "app"}>
       {(!joinedRoom || isRoomMinimized) && (
         <>
-          <Sidebar user={user} coins={coins} setUser={logout} />
+          <Sidebar
+  user={user}
+  coins={coins}
+  setUser={logout}
+  backendUrl={backendUrl}
+  setCurrentUser={setUser}
+/>
 
           <HomePage
             rooms={rooms}
