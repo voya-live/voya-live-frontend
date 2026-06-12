@@ -61,6 +61,8 @@ export default function RoomPage(props) {
     roomMembers,
     memberRequests,
     roomAdmins,
+    roomDescription,
+    saveRoomDescription,
     addAdmin,
     removeAdmin,
     requestMembership,
@@ -76,6 +78,7 @@ export default function RoomPage(props) {
   const [profileData, setProfileData] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isRoomPanelOpen, setIsRoomPanelOpen] = useState(false);
+  const [roomDescriptionText, setRoomDescriptionText] = useState("");
 
   const micRef = useRef(null);
   const joinedRef = useRef(false);
@@ -226,6 +229,13 @@ export default function RoomPage(props) {
     if (!selectedUser) return;
     loadUserProfile(selectedUser);
   }, [selectedUser]);
+  useEffect(() => {
+  if (isRoomPanelOpen) {
+    setRoomDescriptionText(
+      roomDescription || ""
+    );
+  }
+}, [isRoomPanelOpen, roomDescription]);
 
   if (!joinedRoom) return null;
   if (isRoomMinimized) return null;
@@ -369,6 +379,13 @@ export default function RoomPage(props) {
     roomAdmins?.find((admin) => admin.id === userId)
   );
 }
+function isRoomMemberUser(userId) {
+  return Boolean(
+    roomMembers?.find(
+      (member) => String(member.id) === String(userId)
+    )
+  );
+}
 
 function isCurrentUserAdmin() {
   return isRoomAdminUser(currentUser?.phone);
@@ -490,6 +507,11 @@ function canManageSelectedUser(userItem) {
         )}
         {isRoomAdminUser(item.id) && (
   <div className="adminBadge">⭐ Admin</div>
+)}
+{isRoomMemberUser(item.id) &&
+ !isRoomAdminUser(item.id) &&
+ !item.isHost && (
+  <div className="memberBadge">🏅 Member</div>
 )}
 
         {muted && <div className="mutedBadge">🔇 Muted</div>}
@@ -622,6 +644,37 @@ function canManageSelectedUser(userItem) {
       <h2>{joinedRoom.name}</h2>
 
       <p>Host: {joinedRoom.host}</p>
+      <p>
+  Description:
+  {roomDescription || " No room description"}
+</p>
+{isCurrentUserHost && (
+  <>
+    <textarea
+      value={roomDescriptionText}
+      onChange={(e) =>
+        setRoomDescriptionText(e.target.value)
+      }
+      placeholder="Write room description..."
+      rows={4}
+      style={{
+        width: "100%",
+        marginTop: "10px",
+      }}
+    />
+
+    <button
+      className="profileActionBtn"
+      onClick={() => {
+  console.log("BUTTON CLICKED");
+  console.log(saveRoomDescription);
+  saveRoomDescription(roomDescriptionText);
+}}
+    >
+      Save Description
+    </button>
+  </>
+)}
 
       <p>Members: {roomMembers?.length || 0}</p>
 

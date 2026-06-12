@@ -30,6 +30,7 @@ function App() {
   const [roomMembers, setRoomMembers] = useState([]);
   const [memberRequests, setMemberRequests] = useState([]);
   const [roomAdmins, setRoomAdmins] = useState([]);
+  const [roomDescription, setRoomDescription] = useState("");
   const [giftAnimation, setGiftAnimation] = useState(null);
   const [levelUpData, setLevelUpData] = useState(null);
   const [authMode, setAuthMode] = useState("login");
@@ -62,6 +63,9 @@ socket.on("room:memberRequests", (data) => {
 
 socket.on("room:adminsUpdate", (data) => {
   setRoomAdmins(data || []);
+});
+socket.on("room:descriptionUpdate", (data) => {
+  setRoomDescription(data?.description || "");
 });
 
     socket.on("room:error", (data) => {
@@ -160,6 +164,7 @@ socket.on("room:adminsUpdate", (data) => {
       socket.off("room:membersUpdate");
       socket.off("room:memberRequests");
       socket.off("room:adminsUpdate");
+      socket.off("room:descriptionUpdate");
     };
   }, []);
 
@@ -650,6 +655,22 @@ function removeAdmin(userId) {
     userId,
   });
 }
+
+function saveRoomDescription(description) {
+  if (!joinedRoom) return;
+
+  const roomId = String(joinedRoom._id || joinedRoom.id);
+
+  console.log("Saving description", {
+    roomId,
+    description,
+  });
+
+  socket.emit("room:setDescription", {
+    roomId,
+    description,
+  });
+}
  
   async function recharge() {
     const token = localStorage.getItem("voya_token");
@@ -843,6 +864,8 @@ function removeAdmin(userId) {
           approveMember={approveMember}
           memberRequests={memberRequests}
           roomAdmins={roomAdmins}
+          roomDescription={roomDescription}
+          saveRoomDescription={saveRoomDescription}
           addAdmin={addAdmin}
           removeAdmin={removeAdmin}
           unbanUser={unbanUser}
