@@ -661,15 +661,46 @@ function saveRoomDescription(description) {
 
   const roomId = String(joinedRoom._id || joinedRoom.id);
 
-  console.log("Saving description", {
-    roomId,
-    description,
-  });
-
   socket.emit("room:setDescription", {
     roomId,
     description,
   });
+}
+
+async function saveRoomCover(coverImage) {
+  if (!joinedRoom) return;
+
+  const token = localStorage.getItem("voya_token");
+  const roomId = String(joinedRoom._id || joinedRoom.id);
+
+  try {
+    const response = await fetch(`${backendUrl}/api/rooms/${roomId}/cover`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ coverImage }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return alert(data.error || "Failed to update room cover");
+    }
+
+    setJoinedRoom(data.room);
+
+    setRooms((prev) =>
+      prev.map((room) =>
+        String(room._id || room.id) === roomId ? data.room : room
+      )
+    );
+
+    loadRooms();
+  } catch {
+    alert("Update room cover failed");
+  }
 }
  
   async function recharge() {
@@ -866,6 +897,7 @@ function saveRoomDescription(description) {
           roomAdmins={roomAdmins}
           roomDescription={roomDescription}
           saveRoomDescription={saveRoomDescription}
+          saveRoomCover={saveRoomCover}
           addAdmin={addAdmin}
           removeAdmin={removeAdmin}
           unbanUser={unbanUser}

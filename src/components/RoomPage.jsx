@@ -63,6 +63,7 @@ export default function RoomPage(props) {
     roomAdmins,
     roomDescription,
     saveRoomDescription,
+    saveRoomCover,
     addAdmin,
     removeAdmin,
     requestMembership,
@@ -79,6 +80,7 @@ export default function RoomPage(props) {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isRoomPanelOpen, setIsRoomPanelOpen] = useState(false);
   const [roomDescriptionText, setRoomDescriptionText] = useState("");
+  const [roomCoverText, setRoomCoverText] = useState("");
 
   const micRef = useRef(null);
   const joinedRef = useRef(false);
@@ -234,8 +236,12 @@ export default function RoomPage(props) {
     setRoomDescriptionText(
       roomDescription || ""
     );
+
+    setRoomCoverText(
+      joinedRoom?.coverImage || ""
+    );
   }
-}, [isRoomPanelOpen, roomDescription]);
+}, [isRoomPanelOpen, roomDescription, joinedRoom]);
 
   if (!joinedRoom) return null;
   if (isRoomMinimized) return null;
@@ -644,6 +650,19 @@ function canManageSelectedUser(userItem) {
       <h2>{joinedRoom.name}</h2>
 
       <p>Host: {joinedRoom.host}</p>
+      {joinedRoom?.coverImage && (
+  <img
+    src={joinedRoom.coverImage}
+    alt="Room Cover"
+    style={{
+      width: "100%",
+      maxHeight: "180px",
+      objectFit: "cover",
+      borderRadius: "12px",
+      marginBottom: "10px",
+    }}
+  />
+)}
       <p>
   Description:
   {roomDescription || " No room description"}
@@ -664,15 +683,29 @@ function canManageSelectedUser(userItem) {
     />
 
     <button
-      className="profileActionBtn"
-      onClick={() => {
-  console.log("BUTTON CLICKED");
-  console.log(saveRoomDescription);
-  saveRoomDescription(roomDescriptionText);
-}}
-    >
-      Save Description
-    </button>
+  className="profileActionBtn"
+  onClick={() => saveRoomDescription(roomDescriptionText)}
+>
+  Save Description
+</button>
+
+<input
+  type="text"
+  value={roomCoverText}
+  onChange={(e) => setRoomCoverText(e.target.value)}
+  placeholder="Room cover image URL"
+  style={{
+    width: "100%",
+    marginTop: "10px",
+  }}
+/>
+
+<button
+  className="profileActionBtn"
+  onClick={() => saveRoomCover(roomCoverText)}
+>
+  Save Cover
+</button>
   </>
 )}
 
