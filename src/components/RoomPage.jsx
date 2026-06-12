@@ -482,6 +482,24 @@ function canManageSelectedUser(userItem) {
     const exp = profileData?.experience || 0;
     return exp % 100;
   }
+function renderAvatar(item, fallback = "U") {
+  if (item?.profileImage) {
+    return (
+      <img
+        src={item.profileImage}
+        alt={item.name || "User"}
+        style={{
+          width: "100%",
+          height: "100%",
+          borderRadius: "50%",
+          objectFit: "cover",
+        }}
+      />
+    );
+  }
+
+  return item?.name?.[0] || fallback;
+}
 
   function renderUserCard(item) {
     const speaker = getSpeaker(item);
@@ -498,8 +516,8 @@ function canManageSelectedUser(userItem) {
         onClick={() => openProfile(item)}
       >
         <div className="micAvatar">
-          {item.name?.[0] || "U"}
-        </div>
+  {renderAvatar(item)}
+</div>
 
         <div className="seatName">{item.name}</div>
 
@@ -614,8 +632,8 @@ function canManageSelectedUser(userItem) {
         onClick={() => openProfile(host)}
       >
         <div className="hostHeroAvatar">
-          {host.name?.[0] || "H"}
-        </div>
+  {renderAvatar(host, "H")}
+</div>
 
         <h3>{host.name}</h3>
 
@@ -811,8 +829,8 @@ function canManageSelectedUser(userItem) {
               </button>
 
               <div className="profileAvatar">
-                {selectedUser.name?.[0] || "U"}
-              </div>
+  {renderAvatar(selectedUser)}
+</div>
 
               <h3>{selectedUser.name}</h3>
 
@@ -999,8 +1017,8 @@ function canManageSelectedUser(userItem) {
                       onClick={() => openProfile(item)}
                     >
                       <div className="audienceAvatar">
-                        {item.name?.[0] || "U"}
-                      </div>
+  {renderAvatar(item)}
+</div>
 
                       <span>{item.name}</span>
 
