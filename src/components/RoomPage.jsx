@@ -670,9 +670,9 @@ function canManageSelectedUser(userItem) {
       <h2>{joinedRoom.name}</h2>
 
       <p>Host: {joinedRoom.host}</p>
-      {joinedRoom?.coverImage && (
+      {(joinedRoom?.coverImage || roomCoverText) && (
   <img
-    src={joinedRoom.coverImage}
+    src={joinedRoom?.coverImage || roomCoverText}
     alt="Room Cover"
     style={{
       width: "100%",
