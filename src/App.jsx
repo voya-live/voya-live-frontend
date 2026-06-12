@@ -350,6 +350,7 @@ socket.on("room:descriptionUpdate", (data) => {
       user: {
         id: user.phone,
         name: user.name,
+        profileImage: user.profileImage || "",
         isHost,
         roomPassword,
         level: user.level || 1,
@@ -803,6 +804,7 @@ async function saveRoomCover(coverImage) {
         user: {
           id: updatedUser.phone,
           name: updatedUser.name,
+          profileImage: updatedUser.profileImage || "",
           isHost: joinedRoom.host === updatedUser.name,
           level: updatedUser.level || 1,
           experience: updatedUser.experience || 0,
