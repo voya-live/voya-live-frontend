@@ -102,7 +102,9 @@ export default function RoomPage(props) {
     (item) => item.id === currentUser?.phone
   );
 
-  const isCurrentUserHost = currentRoomUser?.isHost || false;
+  const isCurrentUserHost =
+  Boolean(currentRoomUser?.isHost) ||
+  String(joinedRoom?.host || "") === String(currentUser?.name || "");
 
   const currentSpeaker = roomSpeakers.find(
     (item) => item.id === currentUser?.phone
@@ -234,7 +236,7 @@ export default function RoomPage(props) {
   useEffect(() => {
   if (isRoomPanelOpen) {
     setRoomDescriptionText(
-      roomDescription || ""
+      roomDescription || joinedRoom?.description || ""
     );
 
     setRoomCoverText(
@@ -683,7 +685,7 @@ function canManageSelectedUser(userItem) {
 )}
       <p>
   Description:
-  {roomDescription || " No room description"}
+  {roomDescription || joinedRoom?.description || " No room description"}
 </p>
 {isCurrentUserHost && (
   <>
