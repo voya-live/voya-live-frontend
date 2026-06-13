@@ -47,13 +47,18 @@ export default function HomePage({
     setRoomName("");
   }
   const filteredRooms = rooms.filter((room) => {
-  const matchesSearch =
-    room.name
-      ?.toLowerCase()
-      .includes(searchText.toLowerCase()) ||
-    room.host
-      ?.toLowerCase()
-      .includes(searchText.toLowerCase());
+  const keyword = searchText.toLowerCase();
+
+const matchesSearch =
+  room.name
+    ?.toLowerCase()
+    .includes(keyword) ||
+  room.host
+    ?.toLowerCase()
+    .includes(keyword) ||
+  room.category
+    ?.toLowerCase()
+    .includes(keyword);
 
   const matchesCategory =
     roomCategory === "All" ||
