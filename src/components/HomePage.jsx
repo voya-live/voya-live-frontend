@@ -10,7 +10,7 @@ export default function HomePage({
   createRoom,
 }) {
   const [roomName, setRoomName] = useState("");
-  const [roomCategory, setRoomCategory] = useState("Chat");
+  const [roomCategory, setRoomCategory] = useState("All");
   const [searchText, setSearchText] = useState("");
   const [topGifters, setTopGifters] = useState([]);
 
@@ -88,6 +88,7 @@ export default function HomePage({
     value={roomCategory}
     onChange={(e) => setRoomCategory(e.target.value)}
   >
+    <option value="All">🌐 All Rooms</option> 
     <option value="Chat">💬 Chat</option>
     <option value="Music">🎵 Music</option>
     <option value="Gaming">🎮 Gaming</option>
