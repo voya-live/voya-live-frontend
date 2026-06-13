@@ -996,7 +996,10 @@ function renderAvatar(item, fallback = "U") {
           <div>
             {joinedRoom?.coverImage && (
   <img
-    src={joinedRoom.coverImage}
+    src={
+  joinedRoom.coverImage ||
+  "/images/voya-default-cover.png"
+}
     alt={joinedRoom.name}
     style={{
       width: "220px",

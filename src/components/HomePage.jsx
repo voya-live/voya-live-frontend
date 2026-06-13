@@ -147,9 +147,15 @@ const matchesSearch =
 
           return (
             <div className="roomCard" key={room.id}>
-              {room.coverImage && (
-  <img
-    src={room.coverImage}
+              <img
+
+  src={
+
+    room.coverImage ||
+
+    "/images/voya-default-cover.png"
+
+  }
     alt={room.name}
     style={{
       width: "100%",
@@ -159,7 +165,7 @@ const matchesSearch =
       marginBottom: "10px",
     }}
   />
-)}
+
               <div className="liveBadge">LIVE</div>
               <span className="tag">
   {room.category || "Chat"}
