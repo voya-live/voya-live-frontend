@@ -739,6 +739,38 @@ async function saveRoomCategory(category) {
     alert("Update room category failed");
   }
 }
+async function deleteRoom(roomId) {
+  const token = localStorage.getItem("voya_token");
+
+  if (!window.confirm("Delete this room?")) return;
+
+  try {
+    const response = await fetch(`${backendUrl}/api/rooms/${roomId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return alert(data.error || "Failed to delete room");
+    }
+
+    setRooms((prev) =>
+      prev.filter(
+        (room) => String(room._id || room.id) !== String(roomId)
+      )
+    );
+
+    if (joinedRoom && String(joinedRoom._id || joinedRoom.id) === String(roomId)) {
+      setJoinedRoom(null);
+    }
+  } catch {
+    alert("Delete room failed");
+  }
+}
  
   async function recharge() {
     const token = localStorage.getItem("voya_token");
@@ -911,6 +943,7 @@ async function saveRoomCategory(category) {
             recharge={recharge}
             setJoinedRoom={joinRoom}
             createRoom={createRoom}
+            deleteRoom={deleteRoom}
           />
         </>
       )}

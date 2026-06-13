@@ -8,6 +8,7 @@ export default function HomePage({
   setJoinedRoom,
   liveRooms,
   createRoom,
+  deleteRoom,
 }) {
   const [roomName, setRoomName] = useState("");
   const [roomCategory, setRoomCategory] = useState("All");
@@ -154,11 +155,20 @@ const matchesSearch =
               <p>Host: {room.host}</p>
 
               <div className="roomFooter">
-                <span>{liveCount} live now</span>
-                <button onClick={() => setJoinedRoom(room)}>
-                  Join
-                </button>
-              </div>
+  <span>{liveCount} live now</span>
+
+  <button onClick={() => setJoinedRoom(room)}>
+    Join
+  </button>
+
+  <button
+    onClick={() =>
+      deleteRoom(room._id || room.id)
+    }
+  >
+    Delete
+  </button>
+</div>
             </div>
           );
         })}
