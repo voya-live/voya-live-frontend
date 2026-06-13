@@ -134,7 +134,6 @@ export default function HomePage({
       <h2 className="sectionTitle">Live Rooms</h2>
 
       <div className="roomGrid">
-        ;
         {filteredRooms.map((room) => {
           const liveCount =
             liveRooms[String(room.id)]?.users?.length || 0;
