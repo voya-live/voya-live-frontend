@@ -1008,6 +1008,19 @@ function renderAvatar(item, fallback = "U") {
 
         <div className="roomTopHeader">
           <div>
+            {joinedRoom?.coverImage && (
+  <img
+    src={joinedRoom.coverImage}
+    alt={joinedRoom.name}
+    style={{
+      width: "220px",
+      height: "120px",
+      objectFit: "cover",
+      borderRadius: "16px",
+      marginBottom: "12px",
+    }}
+  />
+)}
             <h2
   style={{ cursor: "pointer" }}
   onClick={() => setIsRoomPanelOpen(true)}
