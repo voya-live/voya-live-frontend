@@ -64,6 +64,7 @@ export default function RoomPage(props) {
     roomDescription,
     saveRoomDescription,
     saveRoomCover,
+    saveRoomCategory,
     addAdmin,
     removeAdmin,
     requestMembership,
@@ -81,6 +82,7 @@ export default function RoomPage(props) {
   const [isRoomPanelOpen, setIsRoomPanelOpen] = useState(false);
   const [roomDescriptionText, setRoomDescriptionText] = useState("");
   const [roomCoverText, setRoomCoverText] = useState("");
+  const [roomCategoryText, setRoomCategoryText] = useState("Chat");
   const [profileImageMap, setProfileImageMap] = useState({});
 
   const micRef = useRef(null);
@@ -275,6 +277,9 @@ export default function RoomPage(props) {
     setRoomCoverText(
       joinedRoom?.coverImage || ""
     );
+    setRoomCategoryText(
+  joinedRoom?.category || "Chat"
+);
   }
 }, [isRoomPanelOpen, roomDescription, joinedRoom]);
 
@@ -732,6 +737,37 @@ function renderAvatar(item, fallback = "U") {
       <h2>{joinedRoom.name}</h2>
 
       <p>Host: {joinedRoom.host}</p>
+      <div className="roomCategoryBox">
+  <span>Category:</span>
+
+  {isCurrentUserHost ? (
+    <>
+      <select
+        value={roomCategoryText}
+        onChange={(e) =>
+          setRoomCategoryText(e.target.value)
+        }
+      >
+        <option value="Chat">💬 Chat</option>
+        <option value="Music">🎵 Music</option>
+        <option value="Gaming">🎮 Gaming</option>
+        <option value="VIP">💎 VIP</option>
+        <option value="Sports">⚽ Sports</option>
+        <option value="Saudi">🇸🇦 Saudi</option>
+      </select>
+
+      <button
+        onClick={() =>
+          saveRoomCategory(roomCategoryText)
+        }
+      >
+        Save
+      </button>
+    </>
+  ) : (
+    <strong>{joinedRoom.category || "Chat"}</strong>
+  )}
+</div>
       {(joinedRoom?.coverImage || roomCoverText) && (
   <img
     src={joinedRoom?.coverImage || roomCoverText}

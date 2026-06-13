@@ -704,6 +704,41 @@ async function saveRoomCover(coverImage) {
     alert("Update room cover failed");
   }
 }
+async function saveRoomCategory(category) {
+  if (!joinedRoom) return;
+
+  const token = localStorage.getItem("voya_token");
+  const roomId = String(joinedRoom._id || joinedRoom.id);
+
+  try {
+    const response = await fetch(`${backendUrl}/api/rooms/${roomId}/category`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ category }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return alert(data.error || "Failed to update room category");
+    }
+
+    setJoinedRoom(data.room);
+
+    setRooms((prev) =>
+      prev.map((room) =>
+        String(room._id || room.id) === roomId ? data.room : room
+      )
+    );
+
+    loadRooms();
+  } catch {
+    alert("Update room category failed");
+  }
+}
  
   async function recharge() {
     const token = localStorage.getItem("voya_token");
@@ -906,6 +941,7 @@ async function saveRoomCover(coverImage) {
           roomDescription={roomDescription}
           saveRoomDescription={saveRoomDescription}
           saveRoomCover={saveRoomCover}
+          saveRoomCategory={saveRoomCategory}
           addAdmin={addAdmin}
           removeAdmin={removeAdmin}
           unbanUser={unbanUser}
