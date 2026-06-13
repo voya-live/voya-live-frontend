@@ -11,6 +11,7 @@ export default function HomePage({
 }) {
   const [roomName, setRoomName] = useState("");
   const [roomCategory, setRoomCategory] = useState("Chat");
+  const [searchText, setSearchText] = useState("");
   const [topGifters, setTopGifters] = useState([]);
 
   useEffect(() => {
@@ -64,7 +65,11 @@ export default function HomePage({
   return (
     <section className="content">
       <div className="topbar">
-        <input placeholder="Search rooms or hosts..." />
+        <input
+  placeholder="Search rooms or hosts..."
+  value={searchText}
+  onChange={(e) => setSearchText(e.target.value)}
+/>
         <button className="loginBtn">VIP Upgrade</button>
       </div>
 
