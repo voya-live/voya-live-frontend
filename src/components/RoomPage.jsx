@@ -478,10 +478,17 @@ function canManageSelectedUser(userItem) {
   }
 
   function openProfile(item) {
-    setSelectedUser(item);
-    setProfileData(null);
-    setIsFollowing(false);
-  }
+  setSelectedUser({
+    ...item,
+    profileImage:
+      item.profileImage ||
+      profileImageMap[item.id] ||
+      "",
+  });
+
+  setProfileData(null);
+  setIsFollowing(false);
+}
 
   function renderVipBadge(vipLevel) {
     if (!vipLevel || vipLevel <= 0) return null;
