@@ -768,9 +768,12 @@ function renderAvatar(item, fallback = "U") {
     <strong>{joinedRoom.category || "Chat"}</strong>
   )}
 </div>
-      {(joinedRoom?.coverImage || roomCoverText) && (
-  <img
-    src={joinedRoom?.coverImage || roomCoverText}
+      <img
+  src={
+    joinedRoom?.coverImage ||
+    roomCoverText ||
+    "/images/voya-default-cover.png"
+  }
     alt="Room Cover"
     style={{
       width: "100%",
@@ -780,7 +783,6 @@ function renderAvatar(item, fallback = "U") {
       marginBottom: "10px",
     }}
   />
-)}
       <p>
   Description:
   {roomDescription || joinedRoom?.description || " No room description"}
@@ -994,22 +996,20 @@ function renderAvatar(item, fallback = "U") {
 
         <div className="roomTopHeader">
           <div>
-            {joinedRoom?.coverImage && (
-  <img
-    src={
-  joinedRoom.coverImage ||
-  "/images/voya-default-cover.png"
-}
-    alt={joinedRoom.name}
-    style={{
-      width: "220px",
-      height: "120px",
-      objectFit: "cover",
-      borderRadius: "16px",
-      marginBottom: "12px",
-    }}
-  />
-)}
+            <img
+  src={
+    joinedRoom.coverImage ||
+    "/images/voya-default-cover.png"
+  }
+  alt={joinedRoom.name}
+  style={{
+    width: "220px",
+    height: "120px",
+    objectFit: "cover",
+    borderRadius: "16px",
+    marginBottom: "12px",
+  }}
+/>
             <h2
   style={{ cursor: "pointer" }}
   onClick={() => setIsRoomPanelOpen(true)}
