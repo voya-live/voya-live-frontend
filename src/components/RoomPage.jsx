@@ -81,6 +81,7 @@ export default function RoomPage(props) {
   const [isRoomPanelOpen, setIsRoomPanelOpen] = useState(false);
   const [roomDescriptionText, setRoomDescriptionText] = useState("");
   const [roomCoverText, setRoomCoverText] = useState("");
+  const [profileImageMap, setProfileImageMap] = useState({});
 
   const micRef = useRef(null);
   const joinedRef = useRef(false);
@@ -233,6 +234,38 @@ export default function RoomPage(props) {
     if (!selectedUser) return;
     loadUserProfile(selectedUser);
   }, [selectedUser]);
+  useEffect(() => {
+  async function loadRoomUserImages() {
+    const token = localStorage.getItem("voya_token");
+
+    if (!token || roomUsers.length === 0) return;
+
+    const entries = await Promise.all(
+      roomUsers.map(async (item) => {
+        try {
+          const response = await fetch(
+            `${backendUrl}/api/users/profile/${item.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          const data = await response.json();
+
+          return [item.id, data.profileImage || ""];
+        } catch {
+          return [item.id, ""];
+        }
+      })
+    );
+
+    setProfileImageMap(Object.fromEntries(entries));
+  }
+
+  loadRoomUserImages();
+}, [roomUsers.length]);
   useEffect(() => {
   if (isRoomPanelOpen) {
     setRoomDescriptionText(
@@ -483,10 +516,14 @@ function canManageSelectedUser(userItem) {
     return exp % 100;
   }
 function renderAvatar(item, fallback = "U") {
-  if (item?.profileImage) {
+  const image =
+    item?.profileImage ||
+    profileImageMap[item?.id];
+
+  if (image) {
     return (
       <img
-        src={item.profileImage}
+        src={image}
         alt={item.name || "User"}
         style={{
           width: "100%",
