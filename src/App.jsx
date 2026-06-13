@@ -257,7 +257,7 @@ socket.on("room:descriptionUpdate", (data) => {
     }
   }
 
-  async function createRoom(roomName) {
+  async function createRoom(roomName, category = "Chat") {
     const token = localStorage.getItem("voya_token");
 
     try {
@@ -270,6 +270,7 @@ socket.on("room:descriptionUpdate", (data) => {
         body: JSON.stringify({
           name: roomName,
           tag: "Live",
+          category,
         }),
       });
 

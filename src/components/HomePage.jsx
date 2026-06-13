@@ -10,6 +10,7 @@ export default function HomePage({
   createRoom,
 }) {
   const [roomName, setRoomName] = useState("");
+  const [roomCategory, setRoomCategory] = useState("Chat");
   const [topGifters, setTopGifters] = useState([]);
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export default function HomePage({
       return alert("Enter room name");
     }
 
-    createRoom(roomName);
+    createRoom(roomName, roomCategory);
     setRoomName("");
   }
 
@@ -57,16 +58,28 @@ export default function HomePage({
         <p>Create or join live voice rooms in real time.</p>
 
         <div className="createRoomBox">
-          <input
-            placeholder="Enter new room name..."
-            value={roomName}
-            onChange={(e) => setRoomName(e.target.value)}
-          />
+  <input
+    placeholder="Enter new room name..."
+    value={roomName}
+    onChange={(e) => setRoomName(e.target.value)}
+  />
 
-          <button onClick={handleCreateRoom}>
-            Start Room
-          </button>
-        </div>
+  <select
+    value={roomCategory}
+    onChange={(e) => setRoomCategory(e.target.value)}
+  >
+    <option value="Chat">💬 Chat</option>
+    <option value="Music">🎵 Music</option>
+    <option value="Gaming">🎮 Gaming</option>
+    <option value="VIP">💎 VIP</option>
+    <option value="Sports">⚽ Sports</option>
+    <option value="Saudi">🇸🇦 Saudi</option>
+  </select>
+
+  <button onClick={handleCreateRoom}>
+    Start Room
+  </button>
+</div>
       </div>
 
       <WalletBox coins={coins} recharge={recharge} />
@@ -108,7 +121,9 @@ export default function HomePage({
           return (
             <div className="roomCard" key={room.id}>
               <div className="liveBadge">LIVE</div>
-              <span className="tag">{room.tag}</span>
+              <span className="tag">
+  {room.category || "Chat"}
+</span>
               <h3>{room.name}</h3>
               <p>Host: {room.host}</p>
 
