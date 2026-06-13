@@ -45,6 +45,21 @@ export default function HomePage({
     createRoom(roomName, roomCategory);
     setRoomName("");
   }
+  const filteredRooms = rooms.filter((room) => {
+  const matchesSearch =
+    room.name
+      ?.toLowerCase()
+      .includes(searchText.toLowerCase()) ||
+    room.host
+      ?.toLowerCase()
+      .includes(searchText.toLowerCase());
+
+  const matchesCategory =
+    roomCategory === "All" ||
+    room.category === roomCategory;
+
+  return matchesSearch && matchesCategory;
+});
 
   return (
     <section className="content">
@@ -114,7 +129,8 @@ export default function HomePage({
       <h2 className="sectionTitle">Live Rooms</h2>
 
       <div className="roomGrid">
-        {rooms.map((room) => {
+        ;
+        {filteredRooms.map((room) => {
           const liveCount =
             liveRooms[String(room.id)]?.users?.length || 0;
 
