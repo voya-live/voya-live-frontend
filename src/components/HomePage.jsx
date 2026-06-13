@@ -147,6 +147,19 @@ const matchesSearch =
 
           return (
             <div className="roomCard" key={room.id}>
+              {room.coverImage && (
+  <img
+    src={room.coverImage}
+    alt={room.name}
+    style={{
+      width: "100%",
+      height: "120px",
+      objectFit: "cover",
+      borderRadius: "12px",
+      marginBottom: "10px",
+    }}
+  />
+)}
               <div className="liveBadge">LIVE</div>
               <span className="tag">
   {room.category || "Chat"}
