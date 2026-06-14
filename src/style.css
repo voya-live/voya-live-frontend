@@ -87,7 +87,14 @@ input {
 
 .sidebar {
   width: 270px;
-  background: #111735;
+  background:
+    linear-gradient(
+      rgba(17, 23, 53, 0.86),
+      rgba(17, 23, 53, 0.92)
+    ),
+    url("/images/voya-default-cover.png");
+  background-size: cover;
+  background-position: center;
   padding: 34px 22px;
   display: flex;
   flex-direction: column;
@@ -161,7 +168,15 @@ input {
 }
 
 .hero {
-  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(124, 58, 237, 0.78),
+      rgba(236, 72, 153, 0.68)
+    ),
+    url("/images/voya-default-cover.png");
+  background-size: cover;
+  background-position: center;
   padding: 50px;
   border-radius: 28px;
 }
