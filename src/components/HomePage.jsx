@@ -108,12 +108,14 @@ const matchesSearch =
   </button>
 </div>
       </div>
+      <div className="statsRow">
 
       <WalletBox coins={coins} recharge={recharge} />
 
-      <h2 className="sectionTitle">🏆 Top Gifters</h2>
+      <div className="topGiftersCard">
+  <h2 className="sectionTitle">🏆 Top Gifters</h2>
 
-      <div className="leaderboardBox">
+  <div className="leaderboardBox">
         {topGifters.length > 0 ? (
           topGifters.slice(0, 10).map((user, index) => (
             <div
@@ -137,6 +139,10 @@ const matchesSearch =
           <p className="emptyHands">No leaderboard data yet</p>
         )}
       </div>
+    </div>
+      </div>
+      
+      
 
       <h2 className="sectionTitle">Live Rooms</h2>
 

@@ -58,7 +58,21 @@ export default function Sidebar({
 
   return (
     <aside className="sidebar">
-      <h1>VOYA LIVE</h1>
+      <div className="sidebarBrand">
+
+  <img
+
+    src="/images/voya-icon-512.png"
+
+    alt="VOYA LIVE"
+
+  />
+
+  <h1>VOYA LIVE</h1>
+
+  <p>SOCIAL PLATFORM</p>
+
+</div>
 
       <nav>
         <button>Home</button>

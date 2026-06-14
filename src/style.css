@@ -86,21 +86,41 @@ input {
 }
 
 .sidebar {
-  width: 270px;
+    width: 260px;
+  min-width: 260px;
   background:
     linear-gradient(
       rgba(17, 23, 53, 0.86),
       rgba(17, 23, 53, 0.92)
     ),
-    url("/images/voya-default-cover.png");
+    url("/images/voya-sidebar-bg.png");
   background-size: cover;
   background-position: center;
-  padding: 34px 22px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  border-right: 1px solid rgba(255,255,255,.08);
+}
+.sidebarBrand {
+  text-align: center;
+  padding-top: 18px;
+  margin-bottom: 24px;
 }
 
+.sidebarBrand img {
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  margin: 0 auto 10px;
+  display: block;
+}
+.sidebarBrand p {
+  margin: 4px 0 16px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,.7);
+}
 .sidebar h1 {
   color: #c084fc;
   font-size: 32px;
@@ -187,13 +207,31 @@ input {
 }
 
 .wallet {
-  margin-top: 24px;
-  background: #141b36;
-  padding: 24px;
-  border-radius: 22px;
+  margin-top: 0;
+  background: rgba(20, 27, 54, 0.92);
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+  padding: 26px;
+  border-radius: 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.statsRow {
+  display: grid;
+  grid-template-columns: 0.8fr 1.6fr;
+  gap: 22px;
+  align-items: start;
+  margin-top: 24px;
+}
+.topGiftersCard {
+  display: flex;
+  flex-direction: column;
+}
+
+.topGiftersCard .sectionTitle {
+  margin-top: 0;
+  margin-bottom: 12px;
 }
 
 .roomGrid {
@@ -203,10 +241,21 @@ input {
 }
 
 .roomCard {
-  background: #151d3b;
-  padding: 26px;
+  background: linear-gradient(180deg, #182145, #101733);
+  border: 1px solid rgba(124, 58, 237, 0.22);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.32);
+  padding: 18px;
   border-radius: 22px;
   position: relative;
+  overflow: hidden;
+}
+.roomCard img {
+  display: block;
+  width: 100%;
+  height: 135px;
+  object-fit: cover;
+  border-radius: 16px;
+  margin-bottom: 14px;
 }
 
 .liveBadge {
@@ -729,9 +778,11 @@ input {
 
 /* Leaderboard */
 .leaderboardBox {
-  background: #1d2750;
-  border-radius: 16px;
-  padding: 15px;
+  background: rgba(29, 39, 80, 0.92);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+  padding: 18px;
   margin-bottom: 25px;
 }
 
