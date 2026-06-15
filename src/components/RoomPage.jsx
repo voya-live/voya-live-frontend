@@ -65,6 +65,7 @@ export default function RoomPage(props) {
     saveRoomDescription,
     saveRoomCover,
     saveRoomCategory,
+    deleteRoom,
     addAdmin,
     removeAdmin,
     requestMembership,
@@ -80,6 +81,7 @@ export default function RoomPage(props) {
   const [profileData, setProfileData] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isRoomPanelOpen, setIsRoomPanelOpen] = useState(false);
+  const [isAllMuted, setIsAllMuted] = useState(false);
   const [roomDescriptionText, setRoomDescriptionText] = useState("");
   const [roomCoverText, setRoomCoverText] = useState("");
   const [roomCategoryText, setRoomCategoryText] = useState("Chat");
@@ -1062,13 +1064,15 @@ function renderAvatar(item, fallback = "U") {
 
               {isCurrentUserHost && (
   <div className="hostRoomControls">
-    <button onClick={() => hostMuteAll(true)}>
-      Mute All
-    </button>
-
-    <button onClick={() => hostMuteAll(false)}>
-      Unmute All
-    </button>
+    <button
+  className={isAllMuted ? "unlockRoomBtn" : "lockRoomBtn"}
+  onClick={() => {
+    hostMuteAll(!isAllMuted);
+    setIsAllMuted(!isAllMuted);
+  }}
+>
+  {isAllMuted ? "Unmute All" : "Mute All"}
+</button>
 
     {joinedRoom.locked ? (
       <button className="unlockRoomBtn" onClick={unlockRoom}>
@@ -1088,6 +1092,12 @@ function renderAvatar(item, fallback = "U") {
     Set Password
   </button>
 )}
+<button
+  className="dangerBtn"
+  onClick={() => deleteRoom(joinedRoom._id || joinedRoom.id)}
+>
+  Delete Room
+</button>
   </div>
 )}
 

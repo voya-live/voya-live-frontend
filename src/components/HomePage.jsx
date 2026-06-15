@@ -154,25 +154,19 @@ const matchesSearch =
             liveRooms[String(room.id)]?.users?.length || 0;
 
           return (
-            <div className="roomCard" key={room.id}>
+            <div
+  className="roomCard"
+  key={room.id}
+  onClick={() => setJoinedRoom(room)}
+>
               <img
-
+  className="roomCover"
   src={
-
     room.coverImage ||
-
     "/images/voya-default-cover.png"
-
   }
-    alt={room.name}
-    style={{
-      width: "100%",
-      height: "120px",
-      objectFit: "cover",
-      borderRadius: "12px",
-      marginBottom: "10px",
-    }}
-  />
+  alt={room.name}
+/>
 
               <div className="liveBadge">LIVE</div>
               <span className="tag">
@@ -182,19 +176,8 @@ const matchesSearch =
               <p>Host: {room.host}</p>
 
               <div className="roomFooter">
-  <span>{liveCount} live now</span>
-
-  <button onClick={() => setJoinedRoom(room)}>
-    Join
-  </button>
-
-  <button
-    onClick={() =>
-      deleteRoom(room._id || room.id)
-    }
-  >
-    Delete
-  </button>
+  <span>🔥 {liveCount} live now</span>
+  <span>Tap to join</span>
 </div>
             </div>
           );

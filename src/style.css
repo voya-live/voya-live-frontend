@@ -257,6 +257,12 @@ rgba(8, 12, 35, 0.30)
   border-radius: 22px;
   position: relative;
   overflow: hidden;
+  transition: all 0.35s ease;
+}
+.roomCard:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 30px 80px rgba(124, 58, 237, 0.45);
+  border-color: rgba(192, 132, 252, 0.75);
 }
 .roomCard img {
   display: block;
@@ -268,7 +274,7 @@ rgba(8, 12, 35, 0.30)
 }
 
 .liveBadge {
-  background: red;
+  background: linear-gradient(90deg, #ff3b5c, #ff1744);
   width: fit-content;
   padding: 7px 12px;
   border-radius: 12px;
@@ -288,11 +294,22 @@ rgba(8, 12, 35, 0.30)
 
 .roomFooter button,
 .giftBar button {
-  background: #c084fc;
+  background: linear-gradient(90deg, #a855f7, #d946ef);
   padding: 11px 18px;
   border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(168, 85, 247, 0.45);
+  transition: all 0.25s ease;
 }
-
+.roomFooter button:hover,
+.giftBar button:hover {
+  transform: translateY(-2px);
+}
+.joinBtn {
+  min-width: 90px;
+}
+.deleteBtn {
+  background: #2b2f45 !important;
+}
 /* Full Room Page */
 .roomMode {
   display: block;
@@ -478,6 +495,8 @@ rgba(8, 12, 35, 0.30)
   place-items: center;
   font-size: 13px;
   font-weight: bold;
+  box-shadow: 0 0 18px rgba(255, 59, 92, 0.55);
+  color: white;
 }
 
 .micBtn.active {
