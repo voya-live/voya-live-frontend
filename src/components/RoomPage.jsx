@@ -82,6 +82,7 @@ export default function RoomPage(props) {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isRoomPanelOpen, setIsRoomPanelOpen] = useState(false);
   const [isAllMuted, setIsAllMuted] = useState(false);
+  const [showHostControls, setShowHostControls] = useState(false);
   const [roomDescriptionText, setRoomDescriptionText] = useState("");
   const [roomCoverText, setRoomCoverText] = useState("");
   const [roomCategoryText, setRoomCategoryText] = useState("Chat");
@@ -728,7 +729,7 @@ function renderAvatar(item, fallback = "U") {
 
         {isRoomPanelOpen && (
   <div className="profilePopup">
-    <div className="profileCard">
+    <div className="roomPanelCard">
       <button
         className="profileClose"
         onClick={() => setIsRoomPanelOpen(false)}
@@ -736,9 +737,28 @@ function renderAvatar(item, fallback = "U") {
         ×
       </button>
 
+      <img
+  className="roomPanelCover"
+  src={
+    joinedRoom?.coverImage ||
+    roomCoverText ||
+    "/images/voya-default-cover.png"
+  }
+  alt="Room Cover"
+  style={{
+    width: "100%",
+    maxHeight: "180px",
+    objectFit: "cover",
+    borderRadius: "12px",
+    marginBottom: "10px",
+  }}
+/>
+
       <h2>{joinedRoom.name}</h2>
 
-      <p>Host: {joinedRoom.host}</p>
+      <div className="roomHostBadge">
+  👑 {joinedRoom.host}
+</div>
       <div className="roomCategoryBox">
   <span>Category:</span>
 
@@ -770,21 +790,7 @@ function renderAvatar(item, fallback = "U") {
     <strong>{joinedRoom.category || "Chat"}</strong>
   )}
 </div>
-      <img
-  src={
-    joinedRoom?.coverImage ||
-    roomCoverText ||
-    "/images/voya-default-cover.png"
-  }
-    alt="Room Cover"
-    style={{
-      width: "100%",
-      maxHeight: "180px",
-      objectFit: "cover",
-      borderRadius: "12px",
-      marginBottom: "10px",
-    }}
-  />
+     
       <p>
   Description:
   {roomDescription || joinedRoom?.description || " No room description"}
@@ -840,9 +846,11 @@ function renderAvatar(item, fallback = "U") {
   </>
 )}
 
-      <p>Members: {roomMembers?.length || 0}</p>
-
-      <p>Admins: {roomAdmins?.length || 0}</p>
+      <div className="roomStatsRow">
+  <span>👥 {roomMembers?.length || 0} Members</span>
+  <span>🛡 {roomAdmins?.length || 0} Admins</span>
+  <span>🔥 {roomUsers?.length || 0} Online</span>
+</div>
       <h4>Room Admins</h4>
 
 {roomAdmins?.length > 0 ? (
@@ -855,7 +863,6 @@ function renderAvatar(item, fallback = "U") {
   <p>No admins yet</p>
 )}
 
-      <p>Visitors Now: {roomUsers?.length || 0}</p>
       {!isCurrentUserHost && (
   <button
     className="profileActionBtn"
@@ -999,6 +1006,7 @@ function renderAvatar(item, fallback = "U") {
         <div className="roomTopHeader">
           <div>
             <img
+  onClick={() => setIsRoomPanelOpen(true)}
   src={
     joinedRoom.coverImage ||
     "/images/voya-default-cover.png"
@@ -1012,10 +1020,7 @@ function renderAvatar(item, fallback = "U") {
     marginBottom: "12px",
   }}
 />
-            <h2
-  style={{ cursor: "pointer" }}
-  onClick={() => setIsRoomPanelOpen(true)}
->
+            <h2>
   {joinedRoom.name}
 
   {joinedRoom.locked && (
@@ -1065,6 +1070,15 @@ function renderAvatar(item, fallback = "U") {
               {isCurrentUserHost && (
   <div className="hostRoomControls">
     <button
+  className="roomControlsToggle"
+  onClick={() => setShowHostControls(!showHostControls)}
+>
+  ⚙ Room Controls
+</button>
+
+{showHostControls && (
+  <div className="hostControlsPanel">
+    <button
   className={isAllMuted ? "unlockRoomBtn" : "lockRoomBtn"}
   onClick={() => {
     hostMuteAll(!isAllMuted);
@@ -1100,20 +1114,34 @@ function renderAvatar(item, fallback = "U") {
 </button>
   </div>
 )}
+</div>
 
-              <div className="speakerCircleGrid">
+)}
+
+              <div
+  className={
+    speakerUsers.length > 0
+      ? "speakerCircleGrid speakerCircleGridActive"
+      : "speakerCircleGrid"
+  }
+>
                 {speakerUsers.length > 0 ? (
                   speakerUsers.map((item) => renderUserCard(item))
                 ) : (
                   <div className="emptyStageBox">
-                    No speakers yet
-                  </div>
+  <div>
+    <div className="emptyStageIcon">🎙️</div>
+    <h3>Speaker Stage</h3>
+    <p>No speakers yet</p>
+    <span>Be the first to raise your hand and speak</span>
+  </div>
+</div>
                 )}
               </div>
             </div>
 
             <div className="stageSection audienceSection">
-              <h4>Audience</h4>
+              <h4>👥 Audience ({audienceUsers.length})</h4>
               <div className="audienceGrid">
                 {audienceUsers.length > 0 ? (
                   audienceUsers.map((item) => (
@@ -1135,7 +1163,11 @@ function renderAvatar(item, fallback = "U") {
                     </div>
                   ))
                 ) : (
-                  <p className="emptyHands">No audience yet</p>
+                  <div className="emptyAudience">
+
+  👥 No listeners yet
+
+</div>
                 )}
               </div>
             </div>
@@ -1161,11 +1193,13 @@ function renderAvatar(item, fallback = "U") {
 
               {canCurrentUserManage() && (
   <div className="handPanel">
-                  <h4>Hand Requests</h4>
+                  <h4>✋ Hand Requests ({handRequests.length})</h4>
 
                   {handRequests.length === 0 ? (
-                    <p className="emptyHands">No requests</p>
-                  ) : (
+  <div className="emptyHandRequests">
+    No pending requests
+  </div>
+) : (
                     handRequests.map((item) => (
                       <div className="handRequest" key={item.id}>
                         <span>✋ {item.name}</span>

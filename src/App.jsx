@@ -975,6 +975,7 @@ async function deleteRoom(roomId) {
           saveRoomDescription={saveRoomDescription}
           saveRoomCover={saveRoomCover}
           saveRoomCategory={saveRoomCategory}
+          deleteRoom={deleteRoom}
           addAdmin={addAdmin}
           removeAdmin={removeAdmin}
           unbanUser={unbanUser}
