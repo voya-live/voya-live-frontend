@@ -80,10 +80,11 @@ const matchesSearch =
       </div>
 
       <div className="hero">
-        <h2>Feel the Voice</h2>
-        <p>Create or join live voice rooms in real time.</p>
+  <div className="heroContent">
+    <h2>Feel the Voice</h2>
+    <p>Create or join live voice rooms in real time.</p>
 
-        <div className="createRoomBox">
+    <div className="createRoomBox">
   <input
     placeholder="Enter new room name..."
     value={roomName}
@@ -107,7 +108,8 @@ const matchesSearch =
     Start Room
   </button>
 </div>
-      </div>
+  </div>
+</div>
       <div className="statsRow">
 
       <WalletBox coins={coins} recharge={recharge} />

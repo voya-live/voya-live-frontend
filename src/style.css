@@ -191,16 +191,25 @@ input {
   background:
     linear-gradient(
       135deg,
-      rgba(124, 58, 237, 0.78),
-      rgba(236, 72, 153, 0.68)
+      rgba(8, 12, 35, 0.55),
+rgba(8, 12, 35, 0.30)
     ),
-    url("/images/voya-default-cover.png");
+    url("/images/voya-hero-banner.png");
   background-size: cover;
   background-position: center;
   padding: 50px;
   border-radius: 28px;
 }
-
+.heroContent {
+  width: 34%;
+  max-width: 380px;
+  padding: 18px 22px;
+  border-radius: 18px;
+  background: rgba(5, 8, 30, 0.58);
+  backdrop-filter: blur(6px);
+  margin-left: 18px;
+  margin-top: 6px;
+}
 .hero h2 {
   font-size: 42px;
   margin: 0;
