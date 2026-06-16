@@ -1154,7 +1154,7 @@ function renderAvatar(item, fallback = "U") {
   {renderAvatar(item)}
 </div>
 
-                      <span>{item.name}</span>
+                      <span className="audienceName">{item.name}</span>
 
                       <div className="audienceBadges">
                         {renderLevelBadge(item.level)}
@@ -1253,7 +1253,10 @@ function renderAvatar(item, fallback = "U") {
               </div>
             )}
 
-            <h4>Live Chat</h4>
+            <div className="chatHeader">
+  <h4>💬 Live Chat</h4>
+  <span>{messages.length} messages</span>
+</div>
 
             <div className="chatBox roomChatBox">
               {messages.length > 0 ? (
@@ -1264,7 +1267,11 @@ function renderAvatar(item, fallback = "U") {
                   </div>
                 ))
               ) : (
-                <p className="emptyHands">No messages yet</p>
+                <div className="emptyChatState">
+  <div className="emptyChatIcon">💬</div>
+  <p>No messages yet</p>
+  <span>Start the conversation</span>
+</div>
               )}
             </div>
 
@@ -1276,7 +1283,7 @@ function renderAvatar(item, fallback = "U") {
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
               />
 
-              <button onClick={handleSend}>Send</button>
+              <button onClick={handleSend}>➤ Send</button>
             </div>
 
             <div className="giftBar roomGiftBar">
