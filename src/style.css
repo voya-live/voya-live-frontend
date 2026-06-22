@@ -381,10 +381,12 @@ rgba(8, 12, 35, 0.30)
 }
 
 .roomSidebarPanel {
-  width: 380px;
-  min-width: 380px;
-  background: #151d3b;
-  border-radius: 22px;
+  width: 400px;
+  min-width: 400px;
+  background: rgba(21, 29, 59, 0.92);
+  border: 1px solid rgba(124, 58, 237, 0.22);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  border-radius: 24px;
   padding: 18px;
   display: flex;
   flex-direction: column;
@@ -1193,7 +1195,7 @@ rgba(8, 12, 35, 0.30)
 .hostHeroSection {
   display: grid;
   place-items: center;
-  margin: 0 0 16px;
+  margin: 0 0 6px;
 }
 
 .hostHeroCard {
@@ -1206,7 +1208,9 @@ rgba(8, 12, 35, 0.30)
   place-items: center;
   text-align: center;
   padding: 24px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  box-shadow:
+    0 22px 55px rgba(0, 0, 0, 0.38),
+    0 0 38px rgba(124, 58, 237, 0.22);
 }
 
 .hostHeroAvatar {
