@@ -579,6 +579,10 @@ function renderAvatar(item, fallback = "U") {
         </div>
 
         {item.isHost && <div className="hostBadge">👑 Host</div>}
+        <div className="hostStatsRow">
+  <span>🎙 Live</span>
+  <span>👥 {roomUsers.length}</span>
+</div>
 
         {isRoomSpeaker(item) && !item.isHost && (
           <div className="speakerBadge">🎤 Speaker</div>
