@@ -17,12 +17,13 @@ const gifts = [
   { name: "Crown", icon: "👑", amount: 100 },
 ];
 
-function getNumericUid() {
-  const savedUid = localStorage.getItem("agoraUid");
+function getNumericUid(userKey) {
+  const storageKey = `agoraUid:${userKey || "guest"}`;
+  const savedUid = localStorage.getItem(storageKey);
   if (savedUid) return Number(savedUid);
 
-  const newUid = Math.floor(Math.random() * 1000000);
-  localStorage.setItem("agoraUid", String(newUid));
+  const newUid = Math.floor(100000 + Math.random() * 900000);
+  localStorage.setItem(storageKey, String(newUid));
   return newUid;
 }
 
@@ -76,6 +77,7 @@ export default function RoomPage(props) {
   const [micTrack, setMicTrack] = useState(null);
   const [micOn, setMicOn] = useState(false);
   const [activeSpeakers, setActiveSpeakers] = useState([]);
+  const [localAgoraUid, setLocalAgoraUid] = useState(null);
   const [isAgoraJoined, setIsAgoraJoined] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [profileData, setProfileData] = useState(null);
@@ -130,12 +132,13 @@ export default function RoomPage(props) {
         client.enableAudioVolumeIndicator();
 
         client.on("volume-indicator", (volumes) => {
-          const speakingUsers = volumes
-            .filter((v) => v.level > 5)
-            .map((v) => String(v.uid));
 
-          setActiveSpeakers(speakingUsers);
-        });
+  const speakingUsers = volumes
+    .filter((v) => v.level > 25)
+    .map((v) => String(v.uid));
+
+  setActiveSpeakers(speakingUsers);
+});
 
         client.on("user-published", async (remoteUser, mediaType) => {
           await client.subscribe(remoteUser, mediaType);
@@ -145,7 +148,8 @@ export default function RoomPage(props) {
           }
         });
 
-        const uid = getNumericUid();
+        const uid = getNumericUid(currentUser?.phone || currentUser?.name);
+        setLocalAgoraUid(uid);
 
         const tokenRes = await fetch(
           `${backendUrl}/api/agora/token?channelName=${encodeURIComponent(
@@ -412,9 +416,19 @@ export default function RoomPage(props) {
   }
 
   function isUserSpeaking(item) {
-    if (!item.agoraUid) return false;
-    return activeSpeakers.includes(String(item.agoraUid));
-  }
+  const isCurrentUserCard =
+    String(item.id || "") === String(currentUser?.phone || "") ||
+    String(item.phone || "") === String(currentUser?.phone || "") ||
+    String(item.name || "") === String(currentUser?.name || "");
+
+  const cardAgoraUid = isCurrentUserCard
+    ? localAgoraUid
+    : item.agoraUid;
+
+  if (!cardAgoraUid) return false;
+
+  return activeSpeakers.includes(String(cardAgoraUid));
+}
 
   function getSpeaker(item) {
     return roomSpeakers.find((speaker) => speaker.id === item.id);
@@ -567,6 +581,12 @@ function renderAvatar(item, fallback = "U") {
         key={item.id}
         onClick={() => openProfile(item)}
       >
+        {isUserSpeaking(item) && (
+  <div className="voiceCenterLine" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span>
+  </div>
+)}
         <div className="micAvatar">
   {renderAvatar(item)}
 </div>
@@ -687,6 +707,19 @@ function renderAvatar(item, fallback = "U") {
         }
         onClick={() => openProfile(host)}
       >
+        {isUserSpeaking(host) && (
+  <div className="voiceCenterLine" aria-hidden="true">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+)}
         <div className="hostHeroAvatar">
   {renderAvatar(host, "H")}
 </div>

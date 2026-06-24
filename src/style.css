@@ -602,18 +602,74 @@ rgba(8, 12, 35, 0.30)
   background: #444;
   color: #fff;
 }
+.voiceCenterLine {
+  position: absolute;
+  left: 50%;
+  bottom: 58px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 42px;
+  z-index: 3;
+  pointer-events: none;
+}
 
+.voiceCenterLine span {
+  width: 4px;
+  border-radius: 99px;
+  background: linear-gradient(
+    to top,
+    #ff3b4d,
+    #ff6b7a
+  );
+  box-shadow:
+    0 0 8px rgba(255,70,85,.8),
+    0 0 16px rgba(255,70,85,.45);
+  animation: centerVoiceBars 0.9s infinite ease-in-out;
+}
+
+.voiceCenterLine span:nth-child(1) { height: 6px; animation-delay: 0s; }
+.voiceCenterLine span:nth-child(2) { height: 12px; animation-delay: 0.08s; }
+.voiceCenterLine span:nth-child(3) { height: 18px; animation-delay: 0.16s; }
+.voiceCenterLine span:nth-child(4) { height: 24px; animation-delay: 0.24s; }
+.voiceCenterLine span:nth-child(5) { height: 18px; animation-delay: 0.32s; }
+.voiceCenterLine span:nth-child(6) { height: 24px; animation-delay: 0.40s; }
+.voiceCenterLine span:nth-child(7) { height: 18px; animation-delay: 0.48s; }
+.voiceCenterLine span:nth-child(8) { height: 12px; animation-delay: 0.56s; }
+.voiceCenterLine span:nth-child(9) { height: 6px; animation-delay: 0.64s; }
+
+@keyframes centerVoiceBars {
+  0%, 100% {
+    transform: scaleY(0.45);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: scaleY(1.2);
+    opacity: 1;
+  }
+}
 .activeSpeaker .micAvatar {
   box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.45);
   animation: speakingPulse 1.2s infinite ease-in-out;
 }
 .speakerCircleGrid .activeSpeaker {
-  border: 1px solid rgba(239, 68, 68, 0.75);
+  border: 1px solid rgba(239, 68, 68, 0.95);
   box-shadow:
-    0 0 0 1px rgba(239, 68, 68, 0.35),
-    0 0 28px rgba(239, 68, 68, 0.55),
-    0 18px 45px rgba(0, 0, 0, 0.35);
+    0 0 0 1px rgba(239, 68, 68, 0.55),
+    0 0 34px rgba(239, 68, 68, 0.72),
+    0 22px 60px rgba(0, 0, 0, 0.42);
 }
+.speakerCircleGrid .micSeat {
+  position: relative;
+  overflow: visible;
+}
+
+
+
+
+
 
 @keyframes speakingPulse {
   0% {
@@ -1275,7 +1331,7 @@ rgba(8, 12, 35, 0.30)
 
 .speakerCircleGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(125px, 150px));
+  grid-template-columns: repeat(auto-fit, minmax(230px, 230px));
   gap: 18px;
   margin-top: 16px;
   justify-content: center;
@@ -1287,15 +1343,21 @@ rgba(8, 12, 35, 0.30)
 }
 
 .speakerCircleGrid .micSeat {
-  width: 180px;
-  min-height: 240px;
-  border-radius: 30px;
+  width: 230px;
+  min-height: 320px;
+  border-radius: 36px;
+  padding: 28px 22px;
+  background: radial-gradient(circle at top, rgba(124, 58, 237, 0.48), rgba(17, 23, 53, 0.94));
+  border: 1px solid rgba(192, 132, 252, 0.32);
+  position: relative;
+  overflow: visible;
 }
 
 .speakerCircleGrid .micAvatar {
-  margin: 0 auto;
-  width: 64px;
-  height: 64px;
+  margin: 0 auto 12px;
+  width: 78px;
+  height: 78px;
+  border: 3px solid rgba(255, 255, 255, 0.14);
 }
 
 .emptyStageBox {
@@ -1514,4 +1576,8 @@ rgba(8, 12, 35, 0.30)
   color: #93c5fd;
   font-size: 12px;
   font-weight: 800;
+}
+.hostHeroCard {
+  position: relative;
+  overflow: hidden;
 }
