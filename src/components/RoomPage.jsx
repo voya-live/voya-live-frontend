@@ -77,7 +77,6 @@ export default function RoomPage(props) {
   const [micTrack, setMicTrack] = useState(null);
   const [micOn, setMicOn] = useState(false);
   const [activeSpeakers, setActiveSpeakers] = useState([]);
-  const [localAgoraUid, setLocalAgoraUid] = useState(null);
   const [isAgoraJoined, setIsAgoraJoined] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [profileData, setProfileData] = useState(null);
@@ -149,7 +148,6 @@ export default function RoomPage(props) {
         });
 
         const uid = getNumericUid(currentUser?.phone || currentUser?.name);
-        setLocalAgoraUid(uid);
 
         const tokenRes = await fetch(
           `${backendUrl}/api/agora/token?channelName=${encodeURIComponent(
@@ -416,18 +414,9 @@ export default function RoomPage(props) {
   }
 
   function isUserSpeaking(item) {
-  const isCurrentUserCard =
-    String(item.id || "") === String(currentUser?.phone || "") ||
-    String(item.phone || "") === String(currentUser?.phone || "") ||
-    String(item.name || "") === String(currentUser?.name || "");
+  if (!item.agoraUid) return false;
 
-  const cardAgoraUid = isCurrentUserCard
-    ? localAgoraUid
-    : item.agoraUid;
-
-  if (!cardAgoraUid) return false;
-
-  return activeSpeakers.includes(String(cardAgoraUid));
+  return activeSpeakers.includes(String(item.agoraUid));
 }
 
   function getSpeaker(item) {
