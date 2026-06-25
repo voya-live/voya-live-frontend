@@ -41,7 +41,9 @@ function App() {
   });
 
   useEffect(() => {
-    socket.on("rooms:update", (data) => setLiveRooms(data || {}));
+    socket.on("rooms:update", (data) => {
+  setLiveRooms(data || {});
+});
 
     socket.on("room:chat", (message) =>
       setMessages((prev) => [...prev, message])

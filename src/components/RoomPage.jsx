@@ -131,9 +131,9 @@ export default function RoomPage(props) {
         client.enableAudioVolumeIndicator();
 
         client.on("volume-indicator", (volumes) => {
-
+  
   const speakingUsers = volumes
-    .filter((v) => v.level > 25)
+    .filter((v) => v.level > 55)
     .map((v) => String(v.uid));
 
   setActiveSpeakers(speakingUsers);
