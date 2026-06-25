@@ -1271,7 +1271,7 @@ function renderAvatar(item, fallback = "U") {
                 <h4>Top Supporters</h4>
 
                 {roomSupporters.map((item, index) => (
-                  <div className="supporterItem" key={item.name}>
+                  <div className="supporterItem" key={`${item.name || "supporter"}-${index}`}>
                     <span>#{index + 1} {item.name}</span>
                     <span>{item.total}</span>
                   </div>
