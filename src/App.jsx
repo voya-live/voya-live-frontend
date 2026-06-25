@@ -287,16 +287,17 @@ socket.on("room:descriptionUpdate", (data) => {
     }
   }
 
-  function getAgoraUid() {
-    let agoraUid = localStorage.getItem("agoraUid");
+  function getAgoraUid(userKey) {
+  const storageKey = `agoraUid:${userKey || "guest"}`;
+  let agoraUid = localStorage.getItem(storageKey);
 
-    if (!agoraUid) {
-      agoraUid = String(Math.floor(Math.random() * 1000000));
-      localStorage.setItem("agoraUid", agoraUid);
-    }
-
-    return Number(agoraUid);
+  if (!agoraUid) {
+    agoraUid = String(Math.floor(100000 + Math.random() * 900000));
+    localStorage.setItem(storageKey, agoraUid);
   }
+
+  return Number(agoraUid);
+}
 
   async function joinRoom(room) {
     const originalRoomId = String(room._id || room.id);
@@ -315,7 +316,7 @@ socket.on("room:descriptionUpdate", (data) => {
     }
 
     const roomId = String(latestRoom._id || latestRoom.id);
-    const agoraUid = getAgoraUid();
+    const agoraUid = getAgoraUid(user.phone || user.name);
     const isHost = latestRoom.host === user.name;
 
     if (latestRoom.locked && !isHost) {
@@ -867,7 +868,7 @@ async function deleteRoom(roomId) {
 
       socket.emit("room:join", {
         roomId,
-        agoraUid: getAgoraUid(),
+        agoraUid: getAgoraUid(updatedUser.phone || updatedUser.name),
         user: {
           id: updatedUser.phone,
           name: updatedUser.name,
